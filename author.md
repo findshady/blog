@@ -9,5 +9,6 @@ layout: base
 
   <p>Currently learning: malware analysis, understanding VMs</p>
 
-  <p>Junior @ <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Cryptonite MIT</a></p>
+  <p>junior @ https://cryptonitemit.in/</p>
+
 </section>

@@ -155,3 +155,134 @@ a:hover {
   line-height: 1.7;
   font-size: 1rem;
 }
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Fira Code", monospace;
+  padding: 1rem 2rem;
+  z-index: 100;
+  position: relative;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-links a {
+  margin-left: 1rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+.hero {
+  border: 1px solid #444;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin: 2rem auto;
+  background: #111;
+  font-family: "Fira Code", monospace;
+  max-width: 720px;
+  text-align: left;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.hero blockquote {
+  margin-top: 1rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+.post-list {
+  margin-top: 2rem;
+}
+
+.post-preview {
+  padding: 1rem 1.5rem;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #1a1a1a;
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-preview:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.05);
+}
+
+.post-preview h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.post-preview time {
+  font-size: 0.85rem;
+  color: #777;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.about-me {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #111;
+  border-radius: 10px;
+  border: 1px solid #333;
+  font-family: "Fira Code", monospace;
+  line-height: 1.6;
+}
+
+.about-me h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.about-me ul {
+  list-style-type: square;
+  padding-left: 1.2rem;
+  margin-top: 1rem;
+}
+
+.about-me a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.about-me a:hover {
+  text-decoration: underline;
+}
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4rem;
+  padding: 1.5rem 2rem;
+  font-family: "Fira Code", monospace;
+  font-size: 0.85rem;
+  border-top: 1px solid #333;
+  color: #888;
+}
+
+.social-icons a img {
+  width: 20px;
+  height: 20px;
+  margin-left: 1rem;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.social-icons a:hover img {
+  opacity: 1;
+}
