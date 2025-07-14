@@ -5,18 +5,22 @@ layout: base
 
 <section class="hero">
   <h1>shady</h1>
-  <p><strong>Suraj D H</strong> — 19, sophomore at Manipal Institute of Technology, Manipal. Currently learning malware analysis and understanding VMs. Junior @ <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Cryptonite MIT</a>.</p>
+  <p><strong>Reverse Engineering</strong></p>
+  <p><strong>Digital Forensics and Incident Response</strong></p>
+  <p><strong>Malware Analysis</strong></p>
 </section>
 
 <div class="post-list">
-  <h2 class="section-title">Latest Posts</h2>
-  {%- for post in collections.post | reverse -%}
+  <h2 class="post-list-title">Latest Posts</h2>
+
+  {%- for post in collections.posts | reverse -%}
     <div class="post-preview">
       <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %d, %Y" }}</time>
-      <h3>
-        <a href="{{ post.url | url }}">{{ post.data.title }}</a>
-      </h3>
-      <p>{{ post.data.description }}</p>
+      <h3><a href="{{ post.url | url }}">{{ post.data.title }}</a></h3>
+      {% if post.data.description %}
+        <p>{{ post.data.description }}</p>
+      {% endif %}
     </div>
   {%- endfor -%}
+
 </div>

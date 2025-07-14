@@ -43,7 +43,7 @@ body {
 
 .logo {
   font-family: 'Orbitron', sans-serif;
-  font-size: 2rem; /* Bigger */
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text);
   text-decoration: none;
@@ -51,25 +51,38 @@ body {
 }
 .logo:hover {
   animation: breathing 2s ease-in-out infinite;
-  text-decoration: none; /* No underline */
+  text-decoration: none;
 }
 
-.nav-links a {
+/* === NAVIGATION === */
+.navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.nav-links { display: flex; align-items: center; gap: 1.5rem; }
+
+.nav-links a, .theme-toggle {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.2rem; /* Bigger */
-  margin-left: 1.5rem;
+  font-size: 1.2rem;
   color: var(--text);
   text-decoration: none;
   transition: transform 0.3s ease, color 0.3s ease;
 }
-.nav-links a:hover {
+.nav-links a:hover, .theme-toggle:hover {
   transform: scale(1.1);
   color: var(--accent);
   text-decoration: none;
+  animation: breathing 2s ease-in-out infinite;
 }
 
-/* === NAVIGATION & HERO === */
-.navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+/* Style the button to look like the links */
+.theme-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: inherit; /* Ensure vertical alignment */
+}
+
+
+/* === HERO SECTION === */
 .hero { border: 1px solid var(--border); padding: 1.5rem 2rem; border-radius: 12px; background: var(--bg-secondary); }
 .hero p { margin: 0; }
 
@@ -85,7 +98,7 @@ body {
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .post-preview:hover {
-  transform: translateY(-8px) scale(1.02); /* More lively animation */
+  transform: translateY(-8px) scale(1.02);
   box-shadow: 0 10px 25px var(--shadow);
   border-color: var(--accent);
 }
@@ -100,18 +113,14 @@ body {
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
   display: flex;
-  flex-direction: column; /* Stack icons on top of text */
-  align-items: center; /* Center everything */
-  gap: 1.5rem; /* Space between icons and text */
-}
-.social-icons {
-  display: flex;
-  gap: 1.5rem; /* Space between icons */
+  flex-direction: column;
   align-items: center;
+  gap: 1.5rem;
 }
+.social-icons { display: flex; gap: 1.5rem; align-items: center; }
 .social-icons a svg {
-  width: 36px;  /* MUCH Bigger */
-  height: 36px; /* MUCH Bigger */
+  width: 36px;
+  height: 36px;
   fill: var(--icon-color);
   transition: transform 0.3s ease, fill 0.3s ease;
 }
@@ -119,18 +128,7 @@ body {
   transform: scale(1.2);
   fill: var(--accent);
 }
-.footer-text {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
+.footer-text { font-size: 0.9rem; color: var(--text-secondary); }
 
-/* === THEME TOGGLE === */
-.theme-toggle {
-  position: fixed; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text); z-index: 200; transition: transform 0.2s ease, color 0.2s ease;
-}
-.theme-toggle:hover { transform: scale(1.2); color: var(--accent); }
-
-/* === OTHER PAGES === */
-.about-me, .content article {
-  padding-bottom: 2rem; line-height: 1.7; font-size: 1rem;
-}
+/* === GENERAL CONTENT === */
+.content article { padding-bottom: 2rem; line-height: 1.7; font-size: 1rem; }

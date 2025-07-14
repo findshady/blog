@@ -2,10 +2,10 @@
 layout: base
 title: "bi0sCTF 2025 - ഒണപ്പൂക്കളം [DFIR]"
 date: 2025-07-14
-tags: ["DFIR", "CTF", "2025"]
+tags: ["posts", "DFIR", "CTF", "2025"]
 cover: /assets/img/bi0spng.png
+description: "A deep dive into a challenge I found very interesting from bi0sCTF 2025, involving android app forensics, RC4 decryption, and Realm database recovery"
 ---
-
 
 # Challenge Name 
 
