@@ -19,6 +19,7 @@
   --code-header: #1a1a1a;
   --code-text: #f8f8f2;
   --line-number-color: #6b7280;
+  --line-number-bg: #0f0f0f;
   --success: #4ade80;
   --warning: #fbbf24;
   --error: #f87171;
@@ -49,6 +50,7 @@
   --code-header: #f1f3f4;
   --code-text: #1a1a1a;
   --line-number-color: #9ca3af;
+  --line-number-bg: #f1f3f4;
   --success: #22c55e;
   --warning: #f59e0b;
   --error: #ef4444;
@@ -386,7 +388,7 @@ article a:hover {
   transform: translateY(-1px);
 }
 
-/* === ENHANCED CODE BLOCKS === */
+/* === CLEAN CODE BLOCKS WITH SIMPLE LINE NUMBERS === */
 pre[class*="language-"] {
   background: var(--code-bg) !important;
   border: 1px solid var(--code-border) !important;
@@ -394,11 +396,13 @@ pre[class*="language-"] {
   padding: 0 !important;
   margin: 2rem 0 !important;
   font-size: 14px !important;
-  line-height: 1.5 !important;
+  line-height: 1.4 !important;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   position: relative;
   font-family: 'Fira Code', monospace !important;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Language header */
@@ -414,6 +418,7 @@ pre[class*="language-"]::before {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: 'Fira Code', monospace;
+  flex-shrink: 0;
 }
 
 /* Copy button */
@@ -440,42 +445,55 @@ pre[class*="language-"]::before {
   border-color: var(--accent);
 }
 
-/* Code content with line numbers */
+/* Code container */
+pre[class*="language-"] .code-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Line numbers column */
+pre[class*="language-"] .line-numbers {
+  background: var(--line-number-bg);
+  border-right: 1px solid var(--code-border);
+  padding: 1rem 0;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--line-number-color);
+  user-select: none;
+  text-align: right;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+pre[class*="language-"] .line-numbers .line-number {
+  display: block;
+  padding: 0 12px 0 8px;
+  height: 1.4em;
+  line-height: 1.4;
+}
+
+/* Code content */
 pre[class*="language-"] code {
   display: block;
-  padding: 1rem 1rem 1rem 4rem !important;
+  padding: 1rem !important;
   overflow-x: auto;
   background: transparent !important;
   color: var(--code-text) !important;
   font-family: 'Fira Code', monospace !important;
-  position: relative;
-  counter-reset: line-number;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  flex: 1;
   white-space: pre;
+  margin: 0 !important;
 }
 
-/* Line spans with line numbers */
+/* Code lines */
 pre[class*="language-"] code .line {
   display: block;
-  counter-increment: line-number;
-  position: relative;
-  min-height: 1.5em;
-  line-height: 1.5;
-}
-
-/* Line numbers */
-pre[class*="language-"] code .line::before {
-  content: counter(line-number);
-  position: absolute;
-  left: -4rem;
-  width: 3rem;
-  text-align: right;
-  color: var(--line-number-color);
-  font-size: 0.9em;
-  user-select: none;
-  padding-right: 0.8rem;
-  border-right: 1px solid var(--code-border);
-  background: var(--code-bg);
-  font-family: 'Fira Code', monospace;
+  min-height: 1.4em;
+  line-height: 1.4;
 }
 
 /* === RESPONSIVE DESIGN === */
@@ -484,25 +502,26 @@ pre[class*="language-"] code .line::before {
     font-size: 13px !important;
   }
   
-  pre[class*="language-"] code {
-    padding-left: 3.5rem !important;
+  pre[class*="language-"] .line-numbers {
+    min-width: 45px;
   }
   
-  pre[class*="language-"] code .line::before {
-    left: -3.5rem;
-    width: 2.5rem;
+  pre[class*="language-"] .line-numbers .line-number {
+    padding: 0 10px 0 6px;
   }
 }
 
 @media (max-width: 768px) {
-  pre[class*="language-"] code {
-    padding-left: 3rem !important;
+  pre[class*="language-"] {
+    font-size: 12px !important;
   }
   
-  pre[class*="language-"] code .line::before {
-    left: -3rem;
-    width: 2rem;
-    padding-right: 0.5rem;
+  pre[class*="language-"] .line-numbers {
+    min-width: 40px;
+  }
+  
+  pre[class*="language-"] .line-numbers .line-number {
+    padding: 0 8px 0 4px;
   }
   
   .copy-button {
@@ -511,6 +530,7 @@ pre[class*="language-"] code .line::before {
     padding: 0.25rem 0.5rem;
   }
 }
+
 /* === ENHANCED SYNTAX HIGHLIGHTING === */
 /* Comments */
 .token.comment,
@@ -650,10 +670,6 @@ pre[class*="language-"] code .line::before {
     padding: 3rem 2rem;
     min-height: 250px;
   }
-  
-  pre[class*="language-"] {
-    font-size: 13px !important;
-  }
 }
 
 @media (max-width: 768px) {
@@ -672,24 +688,6 @@ pre[class*="language-"] code .line::before {
   .hero {
     padding: 2rem 1.5rem;
     min-height: 200px;
-  }
-  
-  pre[class*="language-"] .line-numbers {
-    width: 3rem;
-  }
-  
-  pre[class*="language-"] .line-numbers .line-number {
-    padding-right: 0.5rem;
-  }
-  
-  pre[class*="language-"] code .line {
-    padding-left: 3.5rem;
-  }
-  
-  .copy-button {
-    top: 0.3rem;
-    right: 0.5rem;
-    padding: 0.25rem 0.5rem;
   }
 }
 
