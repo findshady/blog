@@ -1,13 +1,12 @@
 const pluginSyntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
-const pluginTOC = require("eleventy-plugin-toc"); // <-- Added this
+const pluginTOC = require("eleventy-plugin-toc");
 const { DateTime } = require("luxon");
 
 module.exports = function(eleventyConfig) {
   // 📦 Plugins
   eleventyConfig.addPlugin(pluginSyntaxHighlight);
-  // Add the ToC plugin
   eleventyConfig.addPlugin(pluginTOC, {
-    tags: ['h2', 'h3', 'h4'], // Which headers to include in the ToC
+    tags: ['h2', 'h3', 'h4'],
     wrapper: 'div', 
     wrapperClass: 'toc-list',
     ul: true
@@ -16,22 +15,28 @@ module.exports = function(eleventyConfig) {
   // 📁 Static asset copy
   eleventyConfig.addPassthroughCopy("assets");
 
+  // ✅ ADDING THIS GENERIC DATE FILTER BACK
+  eleventyConfig.addFilter("date", (dateObj, format = "yyyy-MM-dd") => {
+    return DateTime.fromJSDate(dateObj).toFormat(format);
+  });
+
   // 📆 Custom date filter for the post hero (e.g., "9 July 2025")
   eleventyConfig.addFilter("postDate", (dateObj) => {
     return DateTime.fromJSDate(dateObj).toFormat("d LLLL yyyy");
   });
 
-  // ✅ Keep your existing 'posts' collection
+  // Your 'posts' collection
   eleventyConfig.addCollection("posts", (collectionApi) =>
     collectionApi.getFilteredByGlob("./posts/*.md")
       .sort((a, b) => b.date - a.date)
   );
 
-  // Structure and templating settings (keeping your Nunjucks config)
+  // Structure and templating settings
   return {
     dir: {
       input: ".",
       includes: "_includes",
+      data: "_data", // Make sure Eleventy knows about your data folder
       output: "dist"
     },
     markdownTemplateEngine: "njk",
