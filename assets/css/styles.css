@@ -1,15 +1,15 @@
+
 /* === THEME & FONT DEFINITIONS === */
 :root.dark {
-  --bg: #000000; /* Shiny Black */
+  --bg: #161616;
   --bg-offset: #1C1C1C;
   --text: #c9d1d9;
   --text-heading: #e2e2e2;
   --text-secondary: #8b949e;
-  --accent: #58a6ff; /* Milder, appealing blue */
+  --accent: #58a6ff;
   --border: #2f2f2f;
-  --icon-color: #8b949e;
-  --icon-hover: #e2e2e2;
   --shadow-color: rgba(88, 166, 255, 0.15);
+  --code-bg: #0D1117;
 }
 body { background-color: var(--bg); color: var(--text); font-family: 'DejaVu Sans Mono', monospace; font-size: 16px; line-height: 1.7; margin: 0; }
 h1, h2, h3, h4, .logo, .nav-links a { font-family: 'Fira Code', sans-serif; color: var(--text-heading); font-weight: 700; text-decoration: none; }
@@ -23,63 +23,41 @@ a:hover { text-decoration: none; }
 .nav-links a:hover, .theme-toggle:hover { color: var(--accent); }
 .theme-toggle { background: none; border: none; padding: 0; cursor: pointer; color: var(--text); }
 
-/* === HOMEPAGE: ELEGANT HERO & SMOOTH ANIMATIONS === */
+/* === HOMEPAGE & HERO BOX === */
 .content-standard { max-width: 720px; margin: 3rem auto; padding: 0 2rem; }
-.hero-def { background: var(--bg-offset); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; }
-.hero-def h2 { font-size: 1.75rem; font-family: 'Fira Code'; font-weight: 700; margin: 0; }
-.hero-def .pronounce { color: var(--text-secondary); font-size: 0.9rem; margin: 0.25rem 0 1rem 0; }
-.hero-def p { margin: 0.5rem 0; }
-.list-title { font-size: 1.5rem; margin: 4rem 0 1.5rem 0; text-align: center; }
+.hero { background: var(--bg-offset); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; margin-bottom: 3rem; text-align: center; }
+.post-list-title { font-size: 1.5rem; margin: 4rem 0 1.5rem 0; text-align: center; }
 .post-preview { background: var(--bg-offset); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.post-preview:hover { transform: translateY(-5px); box-shadow: 0 8px 30px var(--shadow-color); } /* SMOOTH ANIMATION */
-.post-preview h3 a { color: var(--text-heading); } .post-preview p, .post-preview-meta { color: var(--text-secondary); }
+.post-preview:hover { transform: translateY(-5px); box-shadow: 0 8px 30px var(--shadow-color); }
+.post-preview h3 a { color: var(--text-heading); }
 
 /* === BLOG POST & DYNAMIC TOC === */
 .post-layout { display: grid; max-width: 1280px; margin: 0 auto; padding: 2rem; gap: 2rem; grid-template-columns: 1fr; }
 @media (min-width: 1024px) { .post-layout { grid-template-columns: 240px minmax(0, 800px) 1fr; } }
 .post-sidebar { display: none; } @media (min-width: 1024px) { .post-sidebar { display: block; grid-column: 1; position: sticky; top: 100px; align-self: start; } }
 .post-content { grid-column: 1 / -1; } @media (min-width: 1024px) { .post-content { grid-column: 2; } }
-.table-of-contents h4 { font-family: 'Fira Code'; margin-bottom: 1rem; }
+.table-of-contents h4 { font-family: 'Fira Code', sans-serif; margin-bottom: 1rem; }
 .toc-list ul { list-style: none; padding-left: 0; } .toc-list ul ul { padding-left: 1rem; }
 .toc-list li a { display: block; padding: 0.4rem 0.4rem 0.4rem 1rem; color: var(--text-secondary); transition: all 0.2s ease; font-size: 0.9rem; border-left: 2px solid var(--border); border-radius: 0 4px 4px 0; }
 .toc-list li a:hover { color: var(--text-heading); background: var(--bg-offset); }
 .toc-list li a.active { color: var(--accent); border-left-color: var(--accent); background: var(--bg-offset); }
 .post-hero { text-align: center; padding: 3rem 0; } .post-hero h1 { font-size: 3rem; }
-.post-content article a { color: var(--accent); }
-.post-content article img { max-width: 100%; height: auto; border-radius: 8px; }
+article a { color: var(--accent); text-decoration: none; background-image: linear-gradient(var(--accent), var(--accent)); background-position: 0% 100%; background-repeat: no-repeat; background-size: 0% 1px; transition: background-size .3s; }
+article a:hover { background-size: 100% 1px; }
+:not(pre) > code { background: var(--bg-offset); border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.9em; font-family: 'Monaspace Neon', monospace; }
 
-/* === PERFECTIONIST CODE BLOCKS === */
+/* === CODE BLOCKS === */
 div[class*="language-"] { position: relative; }
-pre[class*="language-"] {
-  background: var(--bg) !important; /* SHINY BLACK BACKGROUND */
-  border: 1px solid var(--border) !important;
-  border-radius: 8px !important;
-  padding: 0 !important;
-  margin: 2rem 0 !important;
-  font-family: 'Monaspace Neon', monospace !important;
-}
-/* Header Bar */
+pre[class*="language-"] { background: var(--code-bg) !important; border: 1px solid var(--border) !important; border-radius: 8px !important; padding: 0 !important; margin: 2rem 0 !important; line-height: 1.7; font-family: 'Monaspace Neon', monospace !important; }
 pre[class*="language-"]::before { content: attr(data-language); display: block; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 0.9rem; text-transform: capitalize; }
-/* Code container */
 pre[class*="language-"] code { display: block; padding: 1.5rem; padding-left: 4.5rem; overflow-x: auto; }
-/* FLAWLESS LINE NUMBERS */
-pre.line-numbers { position: relative; }
-pre.line-numbers > code { position: relative; z-index: 1; }
-.line-numbers .line-numbers-rows {
-    position: absolute; top: 50px; left: 0; bottom: 0;
-    width: 3.5rem;
-    padding-top: 1.5rem;
-    border-right: 1px solid var(--border);
-    user-select: none;
-    font-size: 15px;
-    z-index: 0;
-}
+pre.line-numbers { position: relative; } pre.line-numbers > code { position: relative; z-index: 1; }
+.line-numbers .line-numbers-rows { position: absolute; top: 48px; left: 0; bottom: 0; width: 3.5rem; padding-top: 1.5rem; border-right: 1px solid var(--border); user-select: none; font-size: 15px; z-index: 0; }
 .line-numbers-rows > span::before { color: var(--text-secondary) !important; text-shadow: none !important; }
 
-/* === FOOTER & SMOOTH ICON ANIMATION === */
+/* === FOOTER === */
 .site-footer-bottom { text-align: center; margin-top: 4rem; padding: 2rem; border-top: 1px solid var(--border); }
 .social-icons { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
 .social-icons a { color: var(--icon-color); }
-.social-icons a:hover { color: var(--icon-hover); transform: translateY(-3px); } /* SMOOTH ANIMATION */
+.social-icons a:hover { color: var(--text-heading); transform: translateY(-3px); }
 .social-icons a svg { width: 24px; height: 24px; fill: currentColor; transition: color 0.3s ease, transform 0.3s ease; }
-.footer-text { font-size: 0.9rem; color: var(--text-secondary); }
