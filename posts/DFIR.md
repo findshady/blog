@@ -297,7 +297,7 @@ In order to recover the string that was deleted from the `realm` file, we had to
 
 * Dump the file.
 * Carve it out of memory.
-* Reverse the APK using [Blutter](https://github.com/worawit/blutte) to extract the `realm` file using `libapp.so` 
+* Reverse the APK using [Blutter](https://github.com/worawit/blutter) to extract the `realm` file using `libapp.so` 
 
 Of course we went with the third method. After fixing numerous dependency errors while trying to install it, we finally installed it and it gave us the output folder, containing `main.dart`. 
 

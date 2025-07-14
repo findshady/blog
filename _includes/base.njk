@@ -26,7 +26,7 @@
     <div class="post-layout">
       <aside class="post-sidebar">
         <div class="table-of-contents">
-          <h4>Outline</h4>
+          <h4>Table of Contents</h4>
           {{ content | toc | safe }}
         </div>
       </aside>
@@ -54,7 +54,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // --- THEME TOGGLE SCRIPT (WORKING) ---
+      // --- THEME TOGGLE SCRIPT ---
       (function() {
         const toggle = document.getElementById('themeToggle');
         if (!toggle) return;
@@ -62,12 +62,11 @@
         const themes = { light: 'light', dark: 'dark' };
         const icons = { [themes.light]: '⋆', [themes.dark]: '∅' };
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        let currentTheme = localStorage.getItem('theme') || (prefersDark ? themes.dark : themes.light);
+        let currentTheme = themes.dark; // Force dark theme
         
         const applyTheme = (theme) => {
           document.documentElement.className = theme;
           if (icon) icon.textContent = icons[theme];
-          localStorage.setItem('theme', theme);
         };
         
         applyTheme(currentTheme);
@@ -78,41 +77,129 @@
         });
       })();
 
-      // --- DYNAMIC TABLE OF CONTENTS (REWRITTEN & WORKING) ---
+      // --- ENHANCED DYNAMIC TABLE OF CONTENTS ---
       (function() {
-        const tocLinks = document.querySelectorAll('.toc-list a');
+        const tocContainer = document.querySelector('.table-of-contents');
+        if (!tocContainer) return;
+        
+        const tocLinks = tocContainer.querySelectorAll('a[href^="#"]');
         if (tocLinks.length === 0) return;
         
+        // Get all headings referenced in TOC
         const headings = Array.from(tocLinks).map(link => {
-          try {
-            return document.getElementById(decodeURIComponent(link.getAttribute('href').substring(1)));
-          } catch (e) {
-            return null;
-          }
+          const id = link.getAttribute('href').substring(1);
+          return document.getElementById(id);
         }).filter(Boolean);
 
         if (headings.length === 0) return;
 
-        const observer = new IntersectionObserver(entries => {
-          let mostVisibleEntry = null;
+        // Enhanced intersection observer for smooth active state changes
+        const observer = new IntersectionObserver((entries) => {
+          let activeHeading = null;
           let maxRatio = 0;
-
+          
+          // Find the heading with the highest intersection ratio
           entries.forEach(entry => {
-            if (entry.intersectionRatio > maxRatio) {
+            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
               maxRatio = entry.intersectionRatio;
-              mostVisibleEntry = entry;
+              activeHeading = entry.target;
             }
           });
-
-          if (mostVisibleEntry) {
-             const id = mostVisibleEntry.target.getAttribute('id');
-             const activeLink = document.querySelector(`.toc-list a[href="#${encodeURIComponent(id)}"]`);
-             tocLinks.forEach(link => link.classList.remove('active'));
-             if(activeLink) activeLink.classList.add('active');
+          
+          // If no heading is intersecting, find the closest one above viewport
+          if (!activeHeading) {
+            const viewportTop = window.scrollY + 100;
+            let closestHeading = null;
+            let closestDistance = Infinity;
+            
+            headings.forEach(heading => {
+              const headingTop = heading.offsetTop;
+              if (headingTop <= viewportTop) {
+                const distance = viewportTop - headingTop;
+                if (distance < closestDistance) {
+                  closestDistance = distance;
+                  closestHeading = heading;
+                }
+              }
+            });
+            
+            activeHeading = closestHeading;
           }
-        }, { rootMargin: '-80px 0px -85% 0px', threshold: 0.1 });
+          
+          // Update active states
+          tocLinks.forEach(link => {
+            link.classList.remove('active');
+            link.style.transform = 'translateX(0)';
+          });
+          
+          if (activeHeading) {
+            const activeLink = tocContainer.querySelector(`a[href="#${activeHeading.id}"]`);
+            if (activeLink) {
+              activeLink.classList.add('active');
+              activeLink.style.transform = 'translateX(8px)';
+            }
+          }
+        }, {
+          rootMargin: '-20% 0px -70% 0px',
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+        });
 
+        // Observe all headings
         headings.forEach(heading => observer.observe(heading));
+        
+        // Smooth scroll for TOC links
+        tocLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+              const headerOffset = 100; // Account for sticky header
+              const elementPosition = targetElement.offsetTop;
+              const offsetPosition = elementPosition - headerOffset;
+              
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
+            }
+          });
+        });
+      })();
+
+      // --- CODE BLOCK ENHANCEMENTS ---
+      (function() {
+        // Add language labels to code blocks
+        document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
+          const language = pre.className.match(/language-(\w+)/)?.[1] || 'code';
+          pre.setAttribute('data-language', language);
+        });
+        
+        // Add copy button to code blocks
+        document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
+          const button = document.createElement('button');
+          button.className = 'copy-button';
+          button.innerHTML = '📋';
+          button.setAttribute('title', 'Copy code');
+          
+          button.addEventListener('click', async () => {
+            const code = pre.querySelector('code').textContent;
+            try {
+              await navigator.clipboard.writeText(code);
+              button.innerHTML = '✅';
+              button.style.color = '#4ade80';
+              setTimeout(() => {
+                button.innerHTML = '📋';
+                button.style.color = '';
+              }, 2000);
+            } catch (err) {
+              console.error('Failed to copy: ', err);
+            }
+          });
+          
+          pre.appendChild(button);
+        });
       })();
     });
   </script>
