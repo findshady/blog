@@ -1,6 +1,4 @@
-/* assets/css/styles.css */
-
-/* === FONT AND BASE (DARK THEME DEFAULT) === */
+/* === THEME COLORS === */
 :root {
   --bg: #111;
   --bg-secondary: #1a1a1a;
@@ -13,7 +11,7 @@
 }
 
 body.light {
-  --bg: #f0f0f0; /* Papery / Light Grey Background */
+  --bg: #f0f0f0;
   --bg-secondary: #ffffff;
   --text: #1f1f1f;
   --text-secondary: #555;
@@ -23,6 +21,7 @@ body.light {
   --icon-color: #1f1f1f;
 }
 
+/* === BASE & FONT === */
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -38,41 +37,34 @@ body {
 /* === LINKS === */
 a {
   color: var(--accent);
-  transition: all 0.3s ease;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
-
 a:hover {
   text-decoration: underline;
 }
 
-/* === NAVBAR === */
+/* === NAVIGATION === */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem 0;
+  margin-bottom: 2rem;
   font-family: "Fira Code", monospace;
-  padding: 1rem 2rem;
-  z-index: 100;
-  position: relative;
 }
-
 .logo {
   font-weight: bold;
   font-size: 1.1rem;
   color: var(--text);
-  text-decoration: none;
 }
-
 .nav-links a {
-  margin-left: 1rem;
+  margin-left: 1.5rem;
   color: var(--text);
-  text-decoration: none;
-  transition: color 0.3s;
 }
-
 .nav-links a:hover {
   color: var(--accent);
+  text-decoration: none;
 }
 
 /* === HERO SECTION === */
@@ -80,62 +72,45 @@ a:hover {
   border: 1px solid var(--border);
   padding: 1.5rem 2rem;
   border-radius: 12px;
-  margin: 2rem auto;
-  background: var(--bg); /* Use var to adapt */
-  font-family: "Fira Code", monospace;
-  max-width: 720px;
+  background: var(--bg-secondary);
   text-align: left;
 }
-
-.hero h1 {
-  font-size: 2rem;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.2rem;
-}
-
-.hero blockquote {
-  margin-top: 1rem;
-  font-style: italic;
-  opacity: 0.8;
-}
+.hero p { margin: 0; }
 
 /* === POST LIST === */
 .post-list {
   margin-top: 3rem;
 }
-
-.post-list h2.section-title {
+.post-list-title {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--border);
   padding-bottom: 0.5rem;
 }
-
 .post-preview {
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg-secondary);
   margin-bottom: 1.5rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .post-preview:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 16px var(--shadow);
 }
-
+.post-preview h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
 .post-preview h3 a {
-  margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--accent);
   text-decoration: none;
 }
-
 .post-preview time {
   font-size: 0.85rem;
   color: var(--text-secondary);
-  margin-bottom: 0.5rem;
   display: block;
 }
 
@@ -145,34 +120,65 @@ a:hover {
   justify-content: space-between;
   align-items: center;
   margin-top: 4rem;
-  padding: 1.5rem 2rem;
-  font-family: "Fira Code", monospace;
+  padding-top: 1.5rem;
   font-size: 0.85rem;
   border-top: 1px solid var(--border);
   color: var(--text-secondary);
 }
-
+.social-icons a {
+  margin-left: 0.5rem;
+}
 .social-icons a svg {
-  width: 22px;
-  height: 22px;
-  margin-left: 1rem;
-  fill: var(--icon-color); /* Use fill to color the SVG */
+  width: 28px;  /* Increased size */
+  height: 28px; /* Increased size */
+  fill: var(--icon-color);
   opacity: 0.7;
   transition: opacity 0.3s ease, fill 0.3s ease;
 }
-
 .social-icons a:hover svg {
   opacity: 1;
   fill: var(--accent);
 }
 
-/* === MISC === */
+/* === THEME TOGGLE === */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text);
+  z-index: 200;
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+}
+.theme-toggle:hover {
+  transform: scale(1.15);
+  color: var(--accent);
+}
+
+/* === ABOUT ME PAGE === */
+.about-me {
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  line-height: 1.6;
+}
+.about-me h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.about-me ul {
+  list-style-type: square;
+  padding-left: 1.2rem;
+  margin-top: 1rem;
+}
+
+/* === GENERAL CONTENT === */
 .content article {
   padding-bottom: 2rem;
   line-height: 1.7;
   font-size: 1rem;
-}
-
-.blob-bg, .grain-overlay, .theme-toggle {
-  display: none; /* Disabling these for clarity, you can re-enable if you wish */
 }

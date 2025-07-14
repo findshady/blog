@@ -1,14 +1,15 @@
 ---
-title: About Me
-layout: base
+title: "About the Author"
+layout: "base"
 ---
 
 <section class="about-me">
-  <h1>shady</h1>
-  <p><strong>Suraj D H</strong> — 19, sophomore at Manipal Institute of Technology, Manipal</p>
-
-  <p>Currently learning: malware analysis, understanding VMs</p>
-
-  <p>junior @ https://cryptonitemit.in/</p>
-
+  <h1>About Shady</h1>
+  <p>This is the author page. You can write your bio here.</p>
+  
+  <ul>
+    <li>Cybersecurity Enthusiast</li>
+    <li>Sophomore at Manipal Institute of Technology</li>
+    <li>Member of <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Cryptonite MIT</a></li>
+  </ul>
 </section>
