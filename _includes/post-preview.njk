@@ -1,0 +1,11 @@
+<div class="post-preview">
+  <div class="post-preview-body">
+    <h3><a href="{{ post.url | url }}">{{ post.data.title }}</a></h3>
+    {% if post.data.description %}
+      <p>{{ post.data.description }}</p>
+    {% endif %}
+    <div class="post-preview-meta">
+      <time datetime="{{ post.date | date('yyyy-MM-dd') }}">{{ post.date | postDate }}</time>
+    </div>
+  </div>
+</div>
