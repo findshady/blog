@@ -7,20 +7,20 @@ const { DateTime } = require("luxon");
 module.exports = function(eleventyConfig) {
   // 📦 Plugins
   eleventyConfig.addPlugin(pluginSyntaxHighlight, {
-    lineNumbers: true, // This is crucial for the line number styling
+    lineNumbers: true, // Absolutely crucial for line number styling
   });
   
   eleventyConfig.addPlugin(pluginTOC, {
-    tags: ['h2', 'h3', 'h4'],
+    tags: ['h2', 'h3', 'h4'], // Headers to include in ToC
     wrapper: 'div',
-    ul: true
+    ul: true,
   });
 
-  // ✅ Set up Markdown-It with the anchor plugin for ToC
+  // ✅ Set up Markdown-It with the anchor plugin, which is REQUIRED for ToC
   const markdownLib = markdownIt({ html: true }).use(markdownItAnchor, {
     permalink: markdownItAnchor.permalink.ariaHidden({
       placement: "before",
-      symbol: "#",
+      symbol: "", // No ugly '#' symbol before headings
     }),
     level: [1, 2, 3, 4],
   });

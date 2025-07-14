@@ -9,14 +9,8 @@ layout: base.njk
 </section>
 
 <div class="post-list">
-  <h2 class="post-list-title">Latest Posts</h2>
-  {%- for post in collections.posts -%}
-    <div class="post-preview">
-      <time datetime="{{ post.date | date('yyyy-MM-dd') }}">{{ post.date | postDate }}</time>
-      <h3><a href="{{ post.url | url }}">{{ post.data.title }}</a></h3>
-      {% if post.data.description %}
-        <p>{{ post.data.description }}</p>
-      {% endif %}
-    </div>
+  <h2 class="list-title"><span>📬</span> Latest Posts</h2>
+  {%- for post in collections.posts | reverse -%}
+    {% include "post-preview.njk" %}
   {%- endfor -%}
 </div>
