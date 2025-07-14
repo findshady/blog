@@ -6,7 +6,7 @@
   <title>{{ title }} | shady</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DejaVu+Sans+Mono:wght@400;700&family=Fira+Code:wght@700&family=Monaspace+Neon&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DejaVu+Sans+Mono:wght@400;700&family=Fira+Code:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
@@ -26,7 +26,7 @@
     <div class="post-layout">
       <aside class="post-sidebar">
         <div class="table-of-contents">
-          <h4>Outline</h4>
+          <h4>Table of Contents</h4>
           {{ content | toc | safe }}
         </div>
       </aside>
@@ -54,45 +54,160 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // --- THEME TOGGLE SCRIPT (WORKING) ---
+      // --- THEME TOGGLE SCRIPT ---
       (function() {
         const toggle = document.getElementById('themeToggle');
         if (!toggle) return;
         const icon = toggle.querySelector('#themeIcon');
         const themes = { light: 'light', dark: 'dark' };
         const icons = { [themes.light]: '⋆', [themes.dark]: '∅' };
-        let currentTheme = 'dark'; // Default to dark
-        const applyTheme = (theme) => { document.documentElement.className = theme; if (icon) icon.textContent = icons[theme]; localStorage.setItem('theme', theme) };
-        applyTheme(localStorage.getItem('theme') || currentTheme);
-        toggle.addEventListener('click', () => { currentTheme = document.documentElement.classList.contains(themes.light) ? themes.dark : themes.light; applyTheme(currentTheme); });
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let currentTheme = themes.dark; // Force dark theme
+        
+        const applyTheme = (theme) => {
+          document.documentElement.className = theme;
+          if (icon) icon.textContent = icons[theme];
+        };
+        
+        applyTheme(currentTheme);
+        
+        toggle.addEventListener('click', () => {
+          currentTheme = document.documentElement.classList.contains(themes.light) ? themes.dark : themes.light;
+          applyTheme(currentTheme);
+        });
       })();
 
-      // --- DYNAMIC TABLE OF CONTENTS (REWRITTEN & WORKING) ---
+      // --- ENHANCED DYNAMIC TABLE OF CONTENTS ---
       (function() {
-        const tocLinks = document.querySelectorAll('.toc-list a');
+        const tocContainer = document.querySelector('.table-of-contents');
+        if (!tocContainer) return;
+        
+        const tocLinks = tocContainer.querySelectorAll('a[href^="#"]');
         if (tocLinks.length === 0) return;
-        const headings = Array.from(tocLinks).map(link => document.getElementById(decodeURIComponent(link.getAttribute('href').substring(1)))).filter(Boolean);
+        
+        // Get all headings referenced in TOC
+        const headings = Array.from(tocLinks).map(link => {
+          const id = link.getAttribute('href').substring(1);
+          return document.getElementById(id);
+        }).filter(Boolean);
+
         if (headings.length === 0) return;
 
-        const observer = new IntersectionObserver(entries => {
-          headings.forEach(heading => {
-            const id = heading.getAttribute('id');
-            const tocLink = document.querySelector(`.toc-list a[href="#${encodeURIComponent(id)}"]`);
-            if (tocLink) tocLink.classList.remove('active');
+        // Enhanced intersection observer for smooth active state changes
+        const observer = new IntersectionObserver((entries) => {
+          let activeHeading = null;
+          let maxRatio = 0;
+          
+          // Find the heading with the highest intersection ratio
+          entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+              maxRatio = entry.intersectionRatio;
+              activeHeading = entry.target;
+            }
           });
-
-          const visibleHeadings = entries.filter(e => e.isIntersecting);
-          if (visibleHeadings.length > 0) {
-            const topHeading = visibleHeadings.reduce((prev, current) => {
-              return prev.boundingClientRect.top < current.boundingClientRect.top ? prev : current;
+          
+          // If no heading is intersecting, find the closest one above viewport
+          if (!activeHeading) {
+            const viewportTop = window.scrollY + 100;
+            let closestHeading = null;
+            let closestDistance = Infinity;
+            
+            headings.forEach(heading => {
+              const headingTop = heading.offsetTop;
+              if (headingTop <= viewportTop) {
+                const distance = viewportTop - headingTop;
+                if (distance < closestDistance) {
+                  closestDistance = distance;
+                  closestHeading = heading;
+                }
+              }
             });
-            const id = topHeading.target.getAttribute('id');
-            const activeLink = document.querySelector(`.toc-list a[href="#${encodeURIComponent(id)}"]`);
-            if (activeLink) activeLink.classList.add('active');
+            
+            activeHeading = closestHeading;
           }
-        }, { rootMargin: '-80px 0px -70% 0px' });
+          
+          // Update active states
+          tocLinks.forEach(link => {
+            link.classList.remove('active');
+          });
+          
+          if (activeHeading) {
+            const activeLink = tocContainer.querySelector(`a[href="#${activeHeading.id}"]`);
+            if (activeLink) {
+              activeLink.classList.add('active');
+            }
+          }
+        }, {
+          rootMargin: '-20% 0px -70% 0px',
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+        });
 
+        // Observe all headings
         headings.forEach(heading => observer.observe(heading));
+        
+        // Smooth scroll for TOC links
+        tocLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+              const headerOffset = 100; // Account for sticky header
+              const elementPosition = targetElement.offsetTop;
+              const offsetPosition = elementPosition - headerOffset;
+              
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
+            }
+          });
+        });
+      })();
+
+      // --- CODE BLOCK ENHANCEMENTS WITH LINE NUMBERS ---
+      (function() {
+        // Add language labels to code blocks
+        document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
+          const language = pre.className.match(/language-(\w+)/)?.[1] || 'code';
+          pre.setAttribute('data-language', language);
+        });
+        
+        // Add line numbers to code blocks
+        document.querySelectorAll('pre[class*="language-"] code').forEach(code => {
+          const lines = code.textContent.split('\n');
+          const numberedLines = lines.map((line, index) => {
+            if (index === lines.length - 1 && line === '') return ''; // Skip empty last line
+            return `<span class="line">${line}</span>`;
+          }).join('\n');
+          code.innerHTML = numberedLines;
+        });
+        
+        // Add copy button to code blocks
+        document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
+          const button = document.createElement('button');
+          button.className = 'copy-button';
+          button.innerHTML = '📋';
+          button.setAttribute('title', 'Copy code');
+          
+          button.addEventListener('click', async () => {
+            const code = pre.querySelector('code').textContent;
+            try {
+              await navigator.clipboard.writeText(code);
+              button.innerHTML = '✅';
+              button.style.color = '#4ade80';
+              setTimeout(() => {
+                button.innerHTML = '📋';
+                button.style.color = '';
+              }, 2000);
+            } catch (err) {
+              console.error('Failed to copy: ', err);
+            }
+          });
+          
+          pre.appendChild(button);
+        });
       })();
     });
   </script>
