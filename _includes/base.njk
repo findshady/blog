@@ -6,8 +6,8 @@
   <title>{{ title }} | shady</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  {# --- THE NEW, CORRECT FONT LINK --- #}
-  <link href="https://fonts.googleapis.com/css2?family=DejaVu+Sans+Mono:wght@400;700&family=Monaspace+Neon:wght@400;700&family=Monaspace+Xenon:wght@400;700&display=swap" rel="stylesheet">
+  {# --- THE FINAL, CORRECT FONT LINK --- #}
+  <link href="https://fonts.googleapis.com/css2?family=DejaVu+Sans+Mono:wght@400;700&family=Monaspace+Neon:wght@400;700&family=Paytone+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
@@ -62,18 +62,95 @@
     <div class="footer-text">© {{ site.currentYear }} All rights reserved.</div>
   </footer>
 
+  {# --- ALL CUSTOM JAVASCRIPT IS HERE --- #}
   <script>
-    (function () {
-      const THEMES = { LIGHT: 'light', DARK: 'dark' };
-      const ICONS = { [THEMES.LIGHT]: '⋆', [THEMES.DARK]: '∅' };
-      const toggle = document.getElementById('themeToggle');
-      const icon = document.getElementById('themeIcon');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      let currentTheme = localStorage.getItem('theme') || (prefersDark ? THEMES.DARK : THEMES.LIGHT);
-      function applyTheme(theme) { document.documentElement.className = theme; icon.textContent = ICONS[theme]; localStorage.setItem('theme', theme); }
-      toggle.addEventListener('click', () => { currentTheme = document.documentElement.classList.contains(THEMES.LIGHT) ? THEMES.DARK : THEMES.LIGHT; applyTheme(currentTheme); });
-      applyTheme(currentTheme);
-    })();
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- THEME TOGGLE SCRIPT ---
+      const themeToggle = {
+        init() {
+          const toggle = document.getElementById('themeToggle');
+          const icon = document.getElementById('themeIcon');
+          const themes = { light: 'light', dark: 'dark' };
+          const icons = { [themes.light]: '⋆', [themes.dark]: '∅' };
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          let currentTheme = localStorage.getItem('theme') || (prefersDark ? themes.dark : themes.light);
+          
+          this.applyTheme(currentTheme, themes, icons, icon);
+          
+          toggle.addEventListener('click', () => {
+            currentTheme = document.documentElement.classList.contains(themes.light) ? themes.dark : themes.light;
+            this.applyTheme(currentTheme, themes, icons, icon);
+          });
+        },
+        applyTheme(theme, themes, icons, icon) {
+          document.documentElement.className = theme;
+          if (icon) icon.textContent = icons[theme];
+          localStorage.setItem('theme', theme);
+        }
+      };
+      themeToggle.init();
+
+      // --- DYNAMIC TABLE OF CONTENTS ---
+      const toc = {
+        init() {
+          const tocLinks = document.querySelectorAll('.toc-list a');
+          const headings = Array.from(tocLinks).map(link => document.getElementById(link.getAttribute('href').substring(1)));
+          
+          if (headings.length === 0) return;
+
+          const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+              const id = entry.target.getAttribute('id');
+              const tocLink = document.querySelector(`.toc-list a[href="#${id}"]`);
+              if (entry.isIntersecting) {
+                tocLinks.forEach(link => link.classList.remove('active'));
+                tocLink.classList.add('active');
+              }
+            });
+          }, { rootMargin: '0px 0px -80% 0px' });
+
+          headings.forEach(heading => {
+            if (heading) observer.observe(heading);
+          });
+        }
+      };
+      toc.init();
+
+      // --- COLLAPSIBLE CODE BLOCKS ---
+      const codeBlocks = {
+        init(lineThreshold = 20) {
+          document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
+            const lines = pre.querySelector('code').textContent.split('\n').length;
+            if (lines > lineThreshold) {
+              this.makeCollapsible(pre, lines, lineThreshold);
+            }
+          });
+        },
+        makeCollapsible(pre, lines, lineThreshold) {
+          pre.classList.add('collapsible', 'collapsed');
+
+          const collapsedCount = lines - 15;
+          const overlay = document.createElement('div');
+          overlay.className = 'collapse-overlay';
+          overlay.innerHTML = `
+            <div class="collapse-line"></div>
+            <span>${collapsedCount} collapsed lines</span>
+            <button class="collapse-button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 12.5a.5.5 0 0 1-1 0V3.5a.5.5 0 0 1 1 0v9zm0 5.5a.5.5 0 0 1-1 0v-1.5a.5.5 0 0 1 1 0v1.5z"/><path d="M12.5 11a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm5.5 0a.5.5 0 0 0 0 1h1.5a.5.5 0 0 0 0-1h-1.5z"/></svg>
+            </button>
+          `;
+          
+          pre.appendChild(overlay);
+
+          overlay.addEventListener('click', () => {
+            pre.classList.remove('collapsed');
+            overlay.remove();
+          });
+        }
+      };
+      codeBlocks.init();
+    });
   </script>
+
 </body>
 </html>
