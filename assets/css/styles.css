@@ -150,3 +150,8 @@ a:hover {
   75%  { transform: scale(1.1) rotate(-1deg); }
   100% { transform: scale(1); }
 }
+.content article {
+  padding-bottom: 2rem;
+  line-height: 1.7;
+  font-size: 1rem;
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
-  <meta charset="utf‑8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title }} | My Slick Blog</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
@@ -17,10 +17,13 @@
     <span id="themeIcon">∅</span>
   </button>
 
-  <main class="content">{{ content }}</main>
+  <main class="content">
+    <article>
+      {{ content }}
+    </article>
+  </main>
 
-  {% assign year = 'now' | date: "%Y" %}
-  <footer>&copy; {{ year }}</footer>
+  <footer>&copy; {{ "now" | date: "%Y" }}</footer>
 
   <!-- 🧠 Theme Toggle Script -->
   <script>

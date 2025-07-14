@@ -2,6 +2,8 @@
 layout: base.liquid
 title: "bi0sCTF 2025 - ഒണപ്പൂക്കളം [DFIR]"
 date: 2025-07-14
+tags: ["DFIR", "CTF", "2025"]
+cover: /assets/img/bi0spng.png
 ---
 
 
