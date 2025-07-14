@@ -1,24 +1,119 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }} | shady</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DejaVu+Sans+Mono:wght@400;700&family=Fira+Code:wght@700&family=Monaspace+Neon&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
-  <header class="site-header"><nav class="navbar"><a class="logo" href="/">Home</a><div class="nav-links"><a href="/author/">Authors</a><a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Team</a><button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span id="themeIcon">∅</span></button></div></nav></header>
-  {% if tags and 'posts' in tags %}<div class="post-layout"><aside class="post-sidebar"><div class="table-of-contents"><h4>Outline</h4>{{ content | toc | safe }}</div></aside><main class="post-content"><div class="post-hero"><h1>{{ title }}</h1><div class="post-meta"><span>{{ date | postDate }}</span></div></div><article>{{ content | safe }}</article></main></div>{% else %}<main class="content-standard">{{ content | safe }}</main>{% endif %}
-  <footer class="site-footer-bottom"><div class="social-icons"><a href="https://github.com/findshady" target="_blank" rel="noopener">{% include "icons/github.svg" %}</a><a href="https://www.linkedin.com/in/suraj-dhondale/" target="_blank" rel="noopener">{% include "icons/linkedin.svg" %}</a><a href="https://open.spotify.com/user/c52qc2nmp7ttyhaykm4roch79?si=cbd1e76703b34d9d" target="_blank" rel="noopener">{% include "icons/spotify.svg" %}</a><a href="mailto:surxj666@gmail.com">{% include "icons/email.svg" %}</a></div><div class="footer-text">© {{ site.currentYear }} All rights reserved.</div></footer>
+
+  <header class="site-header">
+    <nav class="navbar">
+      <a class="logo" href="/">Home</a>
+      <div class="nav-links">
+        <a href="/author/">Authors</a>
+        <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Team</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span id="themeIcon">∅</span></button>
+      </div>
+    </nav>
+  </header>
+
+  {% if tags and 'posts' in tags %}
+    <div class="post-layout">
+      <aside class="post-sidebar">
+        <div class="table-of-contents">
+          <h4>Outline</h4>
+          {{ content | toc | safe }}
+        </div>
+      </aside>
+      <main class="post-content">
+        <div class="post-hero">
+          <h1>{{ title }}</h1>
+          <div class="post-meta"><span>{{ date | postDate }}</span></div>
+        </div>
+        <article>{{ content | safe }}</article>
+      </main>
+    </div>
+  {% else %}
+    <main class="content-standard">{{ content | safe }}</main>
+  {% endif %}
+
+  <footer class="site-footer-bottom">
+    <div class="social-icons">
+      <a href="https://github.com/findshady" target="_blank" rel="noopener">{% include "icons/github.svg" %}</a>
+      <a href="https://www.linkedin.com/in/suraj-dhondale/" target="_blank" rel="noopener">{% include "icons/linkedin.svg" %}</a>
+      <a href="https://open.spotify.com/user/c52qc2nmp7ttyhaykm4roch79?si=cbd1e76703b34d9d" target="_blank" rel="noopener">{% include "icons/spotify.svg" %}</a>
+      <a href="mailto:surxj666@gmail.com">{% include "icons/email.svg" %}</a>
+    </div>
+    <div class="footer-text">© {{ site.currentYear }} All rights reserved.</div>
+  </footer>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // THEME TOGGLE
-      (function(){
-        const toggle=document.getElementById('themeToggle');if(!toggle)return;const icon=toggle.querySelector('#themeIcon'),themes={light:'light',dark:'dark'},icons={[themes.light]:'⋆',[themes.dark]:'∅'},prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;let currentTheme=localStorage.getItem('theme')||(prefersDark?themes.dark:themes.light);const applyTheme=(theme)=>{document.documentElement.className=theme;if(icon)icon.textContent=icons[theme];localStorage.setItem('theme',theme)};applyTheme(currentTheme);toggle.addEventListener('click',()=>{currentTheme=document.documentElement.classList.contains(themes.light)?themes.dark:themes.light;applyTheme(currentTheme)})})();
-      // DYNAMIC TOC
-      (function(){
-        const links=document.querySelectorAll('.toc-list a');if(links.length===0)return;const headings=Array.from(links).map(link=>document.getElementById(decodeURIComponent(link.getAttribute('href').substring(1)))).filter(Boolean);if(headings.length===0)return;const observer=new IntersectionObserver(entries=>{let a=!1;entries.forEach(entry=>{const id=entry.target.getAttribute('id'),link=document.querySelector(`.toc-list a[href="#${encodeURIComponent(id)}"]`);entry.isIntersecting&&entry.intersectionRatio>=.1&&!a&&(links.forEach(l=>l.classList.remove('active')),link.classList.add('active'),a=!0)})},{rootMargin:'-80px 0px -60% 0px',threshold:[.1,.9]});headings.forEach(h=>observer.observe(h))})();
+      // --- THEME TOGGLE SCRIPT (WORKING) ---
+      (function() {
+        const toggle = document.getElementById('themeToggle');
+        if (!toggle) return;
+        const icon = toggle.querySelector('#themeIcon');
+        const themes = { light: 'light', dark: 'dark' };
+        const icons = { [themes.light]: '⋆', [themes.dark]: '∅' };
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let currentTheme = localStorage.getItem('theme') || (prefersDark ? themes.dark : themes.light);
+        
+        const applyTheme = (theme) => {
+          document.documentElement.className = theme;
+          if (icon) icon.textContent = icons[theme];
+          localStorage.setItem('theme', theme);
+        };
+        
+        applyTheme(currentTheme);
+        
+        toggle.addEventListener('click', () => {
+          currentTheme = document.documentElement.classList.contains(themes.light) ? themes.dark : themes.light;
+          applyTheme(currentTheme);
+        });
+      })();
+
+      // --- DYNAMIC TABLE OF CONTENTS (REWRITTEN & WORKING) ---
+      (function() {
+        const tocLinks = document.querySelectorAll('.toc-list a');
+        if (tocLinks.length === 0) return;
+        
+        const headings = Array.from(tocLinks).map(link => {
+          try {
+            return document.getElementById(decodeURIComponent(link.getAttribute('href').substring(1)));
+          } catch (e) {
+            return null;
+          }
+        }).filter(Boolean);
+
+        if (headings.length === 0) return;
+
+        const observer = new IntersectionObserver(entries => {
+          let mostVisibleEntry = null;
+          let maxRatio = 0;
+
+          entries.forEach(entry => {
+            if (entry.intersectionRatio > maxRatio) {
+              maxRatio = entry.intersectionRatio;
+              mostVisibleEntry = entry;
+            }
+          });
+
+          if (mostVisibleEntry) {
+             const id = mostVisibleEntry.target.getAttribute('id');
+             const activeLink = document.querySelector(`.toc-list a[href="#${encodeURIComponent(id)}"]`);
+             tocLinks.forEach(link => link.classList.remove('active'));
+             if(activeLink) activeLink.classList.add('active');
+          }
+        }, { rootMargin: '0px 0px -85% 0px', threshold: 0.1 });
+
+        headings.forEach(heading => observer.observe(heading));
+      })();
     });
   </script>
 </body>
