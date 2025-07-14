@@ -4,7 +4,13 @@ const { DateTime } = require("luxon");
 
 module.exports = function(eleventyConfig) {
   // 📦 Plugins
-  eleventyConfig.addPlugin(pluginSyntaxHighlight);
+  eleventyConfig.addPlugin(pluginSyntaxHighlight, {
+    // Enable line numbers and language display
+    lineNumbers: true,
+    showLineNumbers: true,
+    alwaysWrapLineHighlights: true,
+  });
+  
   eleventyConfig.addPlugin(pluginTOC, {
     tags: ['h2', 'h3', 'h4'],
     wrapper: 'div', 
@@ -15,12 +21,10 @@ module.exports = function(eleventyConfig) {
   // 📁 Static asset copy
   eleventyConfig.addPassthroughCopy("assets");
 
-  // ✅ ADDING THIS GENERIC DATE FILTER BACK
+  // 📆 Custom date filters
   eleventyConfig.addFilter("date", (dateObj, format = "yyyy-MM-dd") => {
     return DateTime.fromJSDate(dateObj).toFormat(format);
   });
-
-  // 📆 Custom date filter for the post hero (e.g., "9 July 2025")
   eleventyConfig.addFilter("postDate", (dateObj) => {
     return DateTime.fromJSDate(dateObj).toFormat("d LLLL yyyy");
   });
@@ -31,12 +35,11 @@ module.exports = function(eleventyConfig) {
       .sort((a, b) => b.date - a.date)
   );
 
-  // Structure and templating settings
   return {
     dir: {
       input: ".",
       includes: "_includes",
-      data: "_data", // Make sure Eleventy knows about your data folder
+      data: "_data",
       output: "dist"
     },
     markdownTemplateEngine: "njk",
