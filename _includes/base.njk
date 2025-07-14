@@ -6,7 +6,11 @@
   <title>{{ title }} | shady</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DejaVu+Sans+Mono:wght@400;700&family=Fira+Code:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DejaVu+Sans+Mono:wght@400;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Add Prism.js for syntax highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
@@ -51,6 +55,10 @@
     </div>
     <div class="footer-text">© {{ site.currentYear }} All rights reserved.</div>
   </footer>
+
+  <!-- Add Prism.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -168,46 +176,49 @@
 
       // --- CODE BLOCK ENHANCEMENTS WITH LINE NUMBERS ---
       (function() {
-        // Add language labels to code blocks
-        document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
-          const language = pre.className.match(/language-(\w+)/)?.[1] || 'code';
-          pre.setAttribute('data-language', language);
-        });
-        
-        // Add line numbers to code blocks
-        document.querySelectorAll('pre[class*="language-"] code').forEach(code => {
-          const lines = code.textContent.split('\n');
-          const numberedLines = lines.map((line, index) => {
-            if (index === lines.length - 1 && line === '') return ''; // Skip empty last line
-            return `<span class="line">${line}</span>`;
-          }).join('\n');
-          code.innerHTML = numberedLines;
-        });
-        
-        // Add copy button to code blocks
-        document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
-          const button = document.createElement('button');
-          button.className = 'copy-button';
-          button.innerHTML = '📋';
-          button.setAttribute('title', 'Copy code');
-          
-          button.addEventListener('click', async () => {
-            const code = pre.querySelector('code').textContent;
-            try {
-              await navigator.clipboard.writeText(code);
-              button.innerHTML = '✅';
-              button.style.color = '#4ade80';
-              setTimeout(() => {
-                button.innerHTML = '📋';
-                button.style.color = '';
-              }, 2000);
-            } catch (err) {
-              console.error('Failed to copy: ', err);
-            }
+        // Wait for Prism to be loaded
+        setTimeout(() => {
+          // Add language labels to code blocks
+          document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
+            const language = pre.className.match(/language-(\w+)/)?.[1] || 'code';
+            pre.setAttribute('data-language', language);
           });
           
-          pre.appendChild(button);
-        });
+          // Add line numbers to code blocks
+          document.querySelectorAll('pre[class*="language-"] code').forEach(code => {
+            const lines = code.innerHTML.split('\n');
+            const numberedLines = lines.map((line, index) => {
+              if (index === lines.length - 1 && line === '') return ''; // Skip empty last line
+              return `<span class="line">${line}</span>`;
+            }).join('\n');
+            code.innerHTML = numberedLines;
+          });
+          
+          // Add copy button to code blocks
+          document.querySelectorAll('pre[class*="language-"]').forEach(pre => {
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.innerHTML = '📋';
+            button.setAttribute('title', 'Copy code');
+            
+            button.addEventListener('click', async () => {
+              const code = pre.querySelector('code').textContent;
+              try {
+                await navigator.clipboard.writeText(code);
+                button.innerHTML = '✅';
+                button.style.color = '#4ade80';
+                setTimeout(() => {
+                  button.innerHTML = '📋';
+                  button.style.color = '';
+                }, 2000);
+              } catch (err) {
+                console.error('Failed to copy: ', err);
+              }
+            });
+            
+            pre.appendChild(button);
+          });
+        }, 100); // Small delay to ensure Prism has processed
       })();
     });
   </script>
