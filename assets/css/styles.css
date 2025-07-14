@@ -17,6 +17,8 @@
   --code-bg: #141414;
   --code-border: #333333;
   --code-header: #1a1a1a;
+  --code-text: #f8f8f2;
+  --line-number-color: #6b7280;
   --success: #4ade80;
   --warning: #fbbf24;
   --error: #f87171;
@@ -24,6 +26,36 @@
   --toc-hover: #8b5cf6;
   --link-color: #60a5fa;
   --link-hover: #3b82f6;
+}
+
+/* === THEME: REFINED LIGHT === */
+:root.light {
+  --bg: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f1f3f4;
+  --text: #1a1a1a;
+  --text-heading: #000000;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --border: #e1e5e9;
+  --border-secondary: #d1d5db;
+  --icon-color: #666666;
+  --icon-hover: #000000;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --code-bg: #f8f9fa;
+  --code-border: #e1e5e9;
+  --code-header: #f1f3f4;
+  --code-text: #1a1a1a;
+  --line-number-color: #9ca3af;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --toc-active: #6366f1;
+  --toc-hover: #8b5cf6;
+  --link-color: #2563eb;
+  --link-hover: #1d4ed8;
 }
 
 /* === TYPOGRAPHY === */
@@ -362,7 +394,7 @@ pre[class*="language-"] {
   padding: 0 !important;
   margin: 2rem 0 !important;
   font-size: 14px !important;
-  line-height: 1.4 !important;
+  line-height: 1.5 !important;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   position: relative;
@@ -408,51 +440,44 @@ pre[class*="language-"]::before {
   border-color: var(--accent);
 }
 
-/* Code content with refined line numbers */
+/* Code content with proper line numbers */
 pre[class*="language-"] code {
   display: block;
-  padding: 1rem 1rem 1rem 0 !important;
+  padding: 1rem !important;
   overflow-x: auto;
   background: transparent !important;
-  color: #f8f8f2 !important;
+  color: var(--code-text) !important;
   font-family: 'Fira Code', monospace !important;
   position: relative;
-  line-height: 1.4;
+  counter-reset: line-number;
 }
 
-/* Line number styling - refined and elegant */
-pre[class*="language-"] .line-numbers {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 3.5rem;
-  height: 100%;
-  background: var(--code-bg);
-  border-right: 1px solid var(--code-border);
-  padding: 1rem 0;
-  user-select: none;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-pre[class*="language-"] .line-numbers .line-number {
-  display: block;
-  height: 1.4em;
-  line-height: 1.4;
-  color: #6b7280;
-  font-size: 0.8rem;
-  text-align: right;
-  padding-right: 0.75rem;
-  font-family: 'Fira Code', monospace;
-  font-weight: 400;
-}
-
-/* Code lines with proper spacing */
+/* Code lines with line numbers */
 pre[class*="language-"] code .line {
   display: block;
+  position: relative;
   padding-left: 4rem;
-  min-height: 1.4em;
-  line-height: 1.4;
+  min-height: 1.5em;
+  line-height: 1.5;
+  counter-increment: line-number;
+}
+
+/* Line numbers - refined and elegant */
+pre[class*="language-"] code .line::before {
+  content: counter(line-number);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3rem;
+  text-align: right;
+  color: var(--line-number-color);
+  font-size: 0.85em;
+  user-select: none;
+  font-family: 'Fira Code', monospace;
+  padding-right: 1rem;
+  border-right: 1px solid var(--code-border);
+  margin-right: 1rem;
+  background: var(--code-bg);
 }
 
 /* === ENHANCED SYNTAX HIGHLIGHTING === */
