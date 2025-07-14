@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  <meta charset="utf‑8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} | My Slick Blog</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css">
+</head>
+<body>
+  <div class="blob-bg"></div>
+  <div class="grain-overlay"></div>
+
+  <!-- 🔁 Theme Toggle Button -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <span id="themeIcon">∅</span>
+  </button>
+
+  <main class="content">{{ content }}</main>
+
+  {% assign year = 'now' | date: "%Y" %}
+  <footer>&copy; {{ year }}</footer>
+
+  <!-- 🧠 Theme Toggle Script -->
+  <script>
+    (function () {
+      const toggle = document.getElementById('themeToggle');
+      const icon = document.getElementById('themeIcon');
+
+      const icons = {
+        dark: '∅',
+        light: '⋆'
+      };
+
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const stored = localStorage.getItem('theme');
+      const current = stored || (prefersDark ? 'dark' : 'light');
+
+      if (current === 'light') {
+        document.body.classList.add('light');
+        icon.textContent = icons.light;
+      } else {
+        icon.textContent = icons.dark;
+      }
+
+      toggle.addEventListener('click', () => {
+        const isLight = document.body.classList.toggle('light');
+        icon.textContent = isLight ? icons.light : icons.dark;
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>

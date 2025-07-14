@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  <meta charset="utf‑8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bi0sCTF 2025 - ഒണപ്പൂക്കളം [DFIR] | My Slick Blog</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css">
+</head>
+<body>
+  <nav><!-- nav links here --></nav>
+  <main><h1>Challenge Name</h1>
+<h2><strong>ഒണപ്പൂക്കളം - bi0sCTF 2025</strong></h2>
+<p>tl;dr</p>
+<ul>
+<li><strong>Analysis of Android app forensics in a linear storyline</strong></li>
+<li><strong>RC4 encrypted notes recovery from Flutter shared preferences</strong></li>
+<li><strong>Analysis of Realm database forensics, deleted data recovery, MVCC artifacts, and more</strong></li>
+</ul>
+<p><strong>Challenge Points</strong> : 944</p>
+<p><strong>Category</strong> : DFIR</p>
+<p><strong>No. of solves</strong> : 11</p>
+<p><strong>Author</strong> : <a href="https://x.com/sp3p3x">sp3p3x</a></p>
+<h2>Description</h2>
+<p>ചെത്തി, മന്ദാരം, തുളസി, മുല്ല, തേന്‍മല്ലി, ചെമ്പരത്തി, ചെണ്ടുമല്ലി, കണിക്കൊന്ന, രത്നമല്ലി, തുമ്പപൂ, മുക്കുറ്റി, കൊങ്ങിണിപ്പൂവ്, മന്ദാരം, ജമന്തി, തെച്ചി.</p>
+<p>I took down some important notes on my phone before I went to prepare my pookkalam. Help me find out what I had written down. Also i saw somebody mess with my phone while i was outside. I fear someone might have deleted or modified some of my important data. While you are there, can you also <em>access my data</em> and figure out what was deleted?</p>
+<p><code>flagPart1</code> -&gt; from my forgotten notes</p>
+<p><code>flagPart2</code> -&gt; string which was modified and then deleted from the realm db</p>
+<p>Format: <code>bi0sctf{flagPart1_flagPart2}</code></p>
+<h2>Handout</h2>
+<ul>
+<li><a href="https://drive.google.com/file/d/1dXtN9FKBir5lCg4RRWhNS_OQC9A7rbjq/view?usp=sharing">Primary Link</a></li>
+<li><a href="https://drive.google.com/file/d/1JRwI4bYPdvisE1PhHOXD8YjD9Ovy40ZA/view?usp=sharing">Mirror Link</a></li>
+</ul>
+<h2>Flag Format:</h2>
+<p><code>bi0sctf{...}</code></p>
+<h1>Solution:</h1>
+<p>We are given a <code>chall.tar.gz</code> file containing an Android data partition image which included user-installed application data, system configurations, logs, and other runtime artifacts.</p>
+<h2>Finding flagPart1</h2>
+<p>Since the challenge description mentioned finding his forgotten notes app, we need to look for a notes app. After navigating through folders for a bit, we see a folder named <code>com.sp3p3x.notesapp-kwX7jTJm7-cebQdQuuwITg==</code> located in <code>\chall\data\app</code>. This folder contains the primary APK (<code>base.apk</code>), native libraries (<code>lib/</code>), and ART-optimized bytecode (<code>oat/</code>).</p>
+<p>Furthermore, one can also find the folder <code>com.sp3p3x.notesapp</code> containing the following folders:</p>
+<p><img src="https://github.com/user-attachments/assets/552c4964-eeb2-4c35-bebe-616f9643bcdb" alt="Pasted image 20250609020552"></p>
+<p>out of which, the most interesting was <code>app_flutter</code>, which contained 7 files</p>
+<p><img src="https://github.com/user-attachments/assets/767808a1-d10a-4030-8112-5099719bfaa3" alt="Pasted image 20250609020620"></p>
+<p>Upon further digging, source code for our notes app can be found in the same folder in <code>com.sp3p3x.notesapp\files\flet\app</code> as <code>main.py</code> containing</p>
+<pre class="language-python"><code class="language-python"><span class="token keyword">import</span> flet <span class="token keyword">as</span> ft
+<span class="token keyword">import</span> datetime<span class="token punctuation">,</span> random<span class="token punctuation">,</span> os<span class="token punctuation">,</span> string
+
+
+<span class="token keyword">def</span> <span class="token function">key_scheduling</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    sched <span class="token operator">=</span> <span class="token punctuation">[</span>i <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+    i <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        i <span class="token operator">=</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> key<span class="token punctuation">[</span>j <span class="token operator">%</span> <span class="token builtin">len</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>
+
+        tmp <span class="token operator">=</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+        sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> tmp
+
+    <span class="token keyword">return</span> sched
+
+
+<span class="token keyword">def</span> <span class="token function">stream_generation</span><span class="token punctuation">(</span>sched<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    stream <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    i <span class="token operator">=</span> <span class="token number">0</span>
+    j <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        i <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> i<span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>
+        j <span class="token operator">=</span> <span class="token punctuation">(</span>sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> j<span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>
+
+        tmp <span class="token operator">=</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+        sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> tmp
+
+        <span class="token keyword">yield</span> sched<span class="token punctuation">[</span><span class="token punctuation">(</span>sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span><span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">encrypt</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    text <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">ord</span><span class="token punctuation">(</span>char<span class="token punctuation">)</span> <span class="token keyword">for</span> char <span class="token keyword">in</span> text<span class="token punctuation">]</span>
+    key <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">ord</span><span class="token punctuation">(</span>char<span class="token punctuation">)</span> <span class="token keyword">for</span> char <span class="token keyword">in</span> key<span class="token punctuation">]</span>
+
+    sched <span class="token operator">=</span> key_scheduling<span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+    key_stream <span class="token operator">=</span> stream_generation<span class="token punctuation">(</span>sched<span class="token punctuation">)</span>
+
+    ciphertext <span class="token operator">=</span> <span class="token string">""</span>
+    <span class="token keyword">for</span> char <span class="token keyword">in</span> text<span class="token punctuation">:</span>
+        enc <span class="token operator">=</span> <span class="token builtin">str</span><span class="token punctuation">(</span><span class="token builtin">hex</span><span class="token punctuation">(</span>char <span class="token operator">^</span> <span class="token builtin">next</span><span class="token punctuation">(</span>key_stream<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        ciphertext <span class="token operator">+=</span> enc
+
+    <span class="token keyword">return</span> ciphertext
+
+
+<span class="token keyword">def</span> <span class="token function">storeData</span><span class="token punctuation">(</span>page<span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    app_data_path <span class="token operator">=</span> os<span class="token punctuation">.</span>getenv<span class="token punctuation">(</span><span class="token string">"FLET_APP_STORAGE_DATA"</span><span class="token punctuation">)</span>
+    fileName <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"{datetime.datetime.now().strftime("</span></span><span class="token operator">%</span>d<span class="token operator">%</span>m<span class="token operator">%</span>Y<span class="token operator">%</span>H<span class="token operator">%</span>M<span class="token operator">%</span>S<span class="token operator">%</span><span class="token string-interpolation"><span class="token string">f")}"</span></span>
+    my_file_path <span class="token operator">=</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>app_data_path<span class="token punctuation">,</span> fileName<span class="token punctuation">)</span>
+
+    key <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>
+        random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>string<span class="token punctuation">.</span>ascii_letters <span class="token operator">+</span> string<span class="token punctuation">.</span>digits<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+
+    encText <span class="token operator">=</span> encrypt<span class="token punctuation">(</span>content<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+
+    page<span class="token punctuation">.</span>client_storage<span class="token punctuation">.</span><span class="token builtin">set</span><span class="token punctuation">(</span>fileName<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+
+    <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>my_file_path<span class="token punctuation">,</span> <span class="token string">"w"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+        f<span class="token punctuation">.</span>write<span class="token punctuation">(</span>encText<span class="token punctuation">)</span>
+
+    page<span class="token punctuation">.</span><span class="token builtin">open</span><span class="token punctuation">(</span>ft<span class="token punctuation">.</span>SnackBar<span class="token punctuation">(</span>ft<span class="token punctuation">.</span>Text<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"File saved to App Data Storage!"</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span>page<span class="token punctuation">:</span> ft<span class="token punctuation">.</span>Page<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    <span class="token keyword">def</span> <span class="token function">saveNote</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        data <span class="token operator">=</span> inputBox<span class="token punctuation">.</span>value
+        <span class="token keyword">if</span> data <span class="token operator">!=</span> <span class="token string">""</span><span class="token punctuation">:</span>
+            storeData<span class="token punctuation">(</span>page<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            page<span class="token punctuation">.</span><span class="token builtin">open</span><span class="token punctuation">(</span>ft<span class="token punctuation">.</span>SnackBar<span class="token punctuation">(</span>ft<span class="token punctuation">.</span>Text<span class="token punctuation">(</span><span class="token string">"Empty content!"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    appBar <span class="token operator">=</span> ft<span class="token punctuation">.</span>AppBar<span class="token punctuation">(</span>title<span class="token operator">=</span>ft<span class="token punctuation">.</span>Text<span class="token punctuation">(</span><span class="token string">"Notes App"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    inputBox <span class="token operator">=</span> ft<span class="token punctuation">.</span>TextField<span class="token punctuation">(</span>hint_text<span class="token operator">=</span><span class="token string">"Enter some text..."</span><span class="token punctuation">,</span> multiline<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> min_lines<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+
+    page<span class="token punctuation">.</span>appbar <span class="token operator">=</span> appBar
+
+    page<span class="token punctuation">.</span>add<span class="token punctuation">(</span>inputBox<span class="token punctuation">)</span>
+    page<span class="token punctuation">.</span>add<span class="token punctuation">(</span>
+        ft<span class="token punctuation">.</span>ElevatedButton<span class="token punctuation">(</span>text<span class="token operator">=</span><span class="token string">"Save Note"</span><span class="token punctuation">,</span> on_click<span class="token operator">=</span>saveNote<span class="token punctuation">,</span> style<span class="token operator">=</span>ft<span class="token punctuation">.</span>ButtonStyle<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+
+
+ft<span class="token punctuation">.</span>app<span class="token punctuation">(</span>main<span class="token punctuation">)</span></code></pre>
+<p>This source code is for a simple <strong>note-taking Android application</strong> built using <strong>Flet</strong>, a Python UI framework for building cross-platform apps.</p>
+<p>Crucial things to note from the source code:</p>
+<ul>
+<li>The encrypted note is written to a file in the path:</li>
+</ul>
+<pre><code>FLET_APP_STORAGE_DATA/&lt;timestamped filename&gt;
+</code></pre>
+<ul>
+<li><code>key_scheduling()</code> and <code>stream_generation()</code> replicate the <strong>KSA (Key Scheduling Algorithm)</strong> and <strong>PRGA (Pseudo-Random Generation Algorithm)</strong> steps of RC4.</li>
+<li>A <strong>random 16-character key</strong> is generated per note using <code>random.choice()</code>.</li>
+</ul>
+<ul>
+<li>The critical vulnerability is in line 43:</li>
+</ul>
+<pre><code>  page.client_storage.set(fileName, key) 
+</code></pre>
+<p>The 16-character encryption keys are stored in Flutter's client storage, which persists locally on the device even after application removal.</p>
+<p>Now, upon navigating to the folder <code>shared_prefs</code>, we see a file <code>FlutterSharedPreferences.xml</code> which contained:</p>
+<pre class="language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version='1.0' encoding='utf-8' standalone='yes' ?></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>map</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>flutter.15052025175732777833<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token entity named-entity" title="&quot;">&amp;quot;</span>1OmIyq5YT50YlWB0<span class="token entity named-entity" title="&quot;">&amp;quot;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>string</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>flutter.15052025175747121993<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token entity named-entity" title="&quot;">&amp;quot;</span>oIdeaSz9iySlAmKJ<span class="token entity named-entity" title="&quot;">&amp;quot;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>string</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>flutter.15052025175936114230<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token entity named-entity" title="&quot;">&amp;quot;</span>YKnQqnrzfTIM9HLu<span class="token entity named-entity" title="&quot;">&amp;quot;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>string</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>flutter.15052025180002742685<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token entity named-entity" title="&quot;">&amp;quot;</span>RhjZrO2JGKQLamST<span class="token entity named-entity" title="&quot;">&amp;quot;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>string</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>flutter.15052025175724299736<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token entity named-entity" title="&quot;">&amp;quot;</span>SkZFksurgEq3Tdhe<span class="token entity named-entity" title="&quot;">&amp;quot;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>string</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>flutter.15052025175950593733<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token entity named-entity" title="&quot;">&amp;quot;</span>M52JUgdj9r6kkVg4<span class="token entity named-entity" title="&quot;">&amp;quot;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>string</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>string</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>flutter.15052025175944264611<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token entity named-entity" title="&quot;">&amp;quot;</span>lunMORQQjKhX9u5H<span class="token entity named-entity" title="&quot;">&amp;quot;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>string</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>map</span><span class="token punctuation">></span></span></code></pre>
+<p>Turns out the encrypted files are named using the timestamp keys. Here's the script used to decipher the contents of the note from given keys of the corresponding files:</p>
+<pre class="language-python"><code class="language-python"><span class="token keyword">import</span> os
+
+<span class="token keyword">def</span> <span class="token function">key_scheduling</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    sched <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    j <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        j <span class="token operator">=</span> <span class="token punctuation">(</span>j <span class="token operator">+</span> sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> key<span class="token punctuation">[</span>i <span class="token operator">%</span> <span class="token builtin">len</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>
+        sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> sched
+
+<span class="token keyword">def</span> <span class="token function">stream_generator</span><span class="token punctuation">(</span>sched<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    i <span class="token operator">=</span> j <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        i <span class="token operator">=</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>
+        j <span class="token operator">=</span> <span class="token punctuation">(</span>j <span class="token operator">+</span> sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>
+        sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">yield</span> sched<span class="token punctuation">[</span><span class="token punctuation">(</span>sched<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> sched<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span><span class="token punctuation">]</span>
+
+<span class="token keyword">def</span> <span class="token function">decrypt</span><span class="token punctuation">(</span>encrypted_hex<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    key_bytes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">ord</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span> <span class="token keyword">for</span> c <span class="token keyword">in</span> key<span class="token punctuation">]</span>
+    sched <span class="token operator">=</span> key_scheduling<span class="token punctuation">(</span>key_bytes<span class="token punctuation">)</span>
+    stream <span class="token operator">=</span> stream_generator<span class="token punctuation">(</span>sched<span class="token punctuation">)</span>
+
+    <span class="token comment"># the encrypted string is just a bunch of hex values concatted</span>
+    hex_parts <span class="token operator">=</span> encrypted_hex<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"0x"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span> 
+    encrypted_bytes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">(</span>part<span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token keyword">for</span> part <span class="token keyword">in</span> hex_parts<span class="token punctuation">]</span>
+
+    <span class="token comment"># XOR each byte with the stream to recover the original text</span>
+    decrypted <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token builtin">chr</span><span class="token punctuation">(</span>b <span class="token operator">^</span> <span class="token builtin">next</span><span class="token punctuation">(</span>stream<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> b <span class="token keyword">in</span> encrypted_bytes<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> decrypted
+
+<span class="token comment"># map of filenames wrt timestamps to encryption keys from client storage</span>
+keys <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"15052025175732777833"</span><span class="token punctuation">:</span> <span class="token string">"1OmIyq5YT50YlWB0"</span><span class="token punctuation">,</span>
+    <span class="token string">"15052025175747121993"</span><span class="token punctuation">:</span> <span class="token string">"oIdeaSz9iySlAmKJ"</span><span class="token punctuation">,</span>
+    <span class="token string">"15052025175936114230"</span><span class="token punctuation">:</span> <span class="token string">"YKnQqnrzfTIM9HLu"</span><span class="token punctuation">,</span>
+    <span class="token string">"15052025180002742685"</span><span class="token punctuation">:</span> <span class="token string">"RhjZrO2JGKQLamST"</span><span class="token punctuation">,</span>
+    <span class="token string">"15052025175724299736"</span><span class="token punctuation">:</span> <span class="token string">"SkZFksurgEq3Tdhe"</span>
+<span class="token punctuation">}</span>
+
+folder <span class="token operator">=</span> <span class="token string">"chall\data\user\0\com.sp3p3x.notesapp\app_flutter"</span>  
+
+<span class="token keyword">for</span> filename<span class="token punctuation">,</span> key <span class="token keyword">in</span> keys<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    file_path <span class="token operator">=</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>folder<span class="token punctuation">,</span> filename<span class="token punctuation">)</span>
+    
+    <span class="token keyword">if</span> <span class="token keyword">not</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span>file_path<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"File </span><span class="token interpolation"><span class="token punctuation">{</span>filename<span class="token punctuation">}</span></span><span class="token string"> not found."</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">continue</span>
+
+    <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>file_path<span class="token punctuation">,</span> <span class="token string">"r"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+        encrypted_data <span class="token operator">=</span> f<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    plaintext <span class="token operator">=</span> decrypt<span class="token punctuation">(</span>encrypted_data<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nDecrypted note from </span><span class="token interpolation"><span class="token punctuation">{</span>filename<span class="token punctuation">}</span></span><span class="token string">:\n</span><span class="token interpolation"><span class="token punctuation">{</span>plaintext<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+<p>and sure enough, that outputted the first part of our flag</p>
+<pre><code>└─$ python3 solve.py
+
+Decrypted note from 15052025175732777833:
+well this was easy
+
+Decrypted note from 15052025175747121993:
+i'll give you the first part of the flag :)
+
+Decrypted note from 15052025175936114230:
+first part of the flag: w311_7h47_p4r7_w45_345y
+
+Decrypted note from 15052025180002742685:
+f4k3_f14g
+
+Decrypted note from 15052025175724299736:
+hello there
+</code></pre>
+<h3>flagPart1:</h3>
+<pre><code>w311_7h47_p4r7_w45_345y
+</code></pre>
+<h2>Finding flagPart2</h2>
+<p>To find the second half of the flag, firstly we need to figure out what <code>realm db</code>file is being mentioned in the description. Upon scouring through the files once again, we came across a screenshot, which was located in a folder called <code>snapshots</code></p>
+<p><img src="https://github.com/user-attachments/assets/9650a2c3-3233-4d2d-bd4d-2e6c78689bdb" alt="Pasted image 20250609023148"></p>
+<p>This hints towards an app called <code>Access My Data</code> (as we previously saw in the same folder as the notes app, and as hinted in the original challenge description), which downloads a certain encrypted <code>.realm</code> file, loads it onto memory and decrypts it.</p>
+<p>Now, A Realm file works similarly to a lightweight relational database. It stores data in tables and records, but unlike SQLite, Realm uses its own efficient binary format and object-based data model.</p>
+<p>In order to recover the string that was deleted from the <code>realm</code> file, we had to get our hands on it first. There are multiple methods to do this :</p>
+<ul>
+<li>Dump the file.</li>
+<li>Carve it out of memory.</li>
+<li>Reverse the APK using <a href="https://github.com/worawit/blutte">Blutter</a> to extract the <code>realm</code> file using <code>libapp.so</code></li>
+</ul>
+<p>Of course we went with the third method. After fixing numerous dependency errors while trying to install it, we finally installed it and it gave us the output folder, containing <code>main.dart</code>.</p>
+<pre class="language-bash"><code class="language-bash">└─$ python3 blutter.py <span class="token builtin class-name">.</span> output
+Dart version: <span class="token number">3.7</span>.2, Snapshot: d91c0e6f35f0eb2e44124e8f42aa44a7, Target: android arm64
+flags: product no-code_comments no-dwarf_stack_traces_mode dedup_instructions no-tsan no-msan arm64 android compressed-pointers
+libapp is loaded at 0x74ed7495f000
+Dart heap at 0x74ec00000000
+Analyzing the application
+Dumping Object Pool
+Generating application assemblies
+Generating Frida script
+</code></pre>
+<pre class="language-bash"><code class="language-bash">┌──<span class="token punctuation">(</span>shady㉿LOQ<span class="token punctuation">)</span>-<span class="token punctuation">[</span>blutter/output/asm/accessmydata<span class="token punctuation">]</span>
+└─$ <span class="token function">file</span> main.dart
+main.dart: C++ source, Unicode text, UTF-8 text</code></pre>
+<p>This file had the disassembly of the APK from which we found the two key parts and the source and logic to build back our <code>realm</code> file. We found :</p>
+<p><img src="https://github.com/user-attachments/assets/6b857ab8-3e28-43ef-8861-f198f26a7fca" alt="Pasted image 20250609024816">
+(snippet of asm output)</p>
+<ul>
+<li>Key part 1 : <code>04e0d32be85f3b4</code></li>
+<li>Key part 2 : <code>7173047a9d6574e5</code></li>
+<li>Link/source : https://github.com/chicken-jockeyy/confidentialdb/raw/refs/heads/main/enc.bin</li>
+<li>Decryption was using AES ECB mode</li>
+</ul>
+<p>Now all we have to do is reverse engineer the logic and we shall have our <code>decrypted.realm</code> file. Here's the script it took :</p>
+<pre class="language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">from</span> Crypto<span class="token punctuation">.</span>Cipher <span class="token keyword">import</span> AES
+<span class="token keyword">from</span> Crypto<span class="token punctuation">.</span>Util<span class="token punctuation">.</span>Padding <span class="token keyword">import</span> unpad
+<span class="token keyword">import</span> base64
+
+url <span class="token operator">=</span> <span class="token string">"https://github.com/chicken-jockeyy/confidentialdb/raw/refs/heads/main/enc.bin"</span>
+response <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span>
+encrypted_data <span class="token operator">=</span> response<span class="token punctuation">.</span>content
+
+key_part1 <span class="token operator">=</span> <span class="token string">"04e0d32be85f3b42"</span>
+key_part2 <span class="token operator">=</span> <span class="token string">"7173047a9d6574e5"</span>
+key <span class="token operator">=</span> <span class="token punctuation">(</span>key_part1 <span class="token operator">+</span> key_part2<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>  <span class="token comment"># reverse the concatenated key</span>
+
+<span class="token comment"># decrypt using AES ECB mode</span>
+cipher <span class="token operator">=</span> AES<span class="token punctuation">.</span>new<span class="token punctuation">(</span>key<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> AES<span class="token punctuation">.</span>MODE_ECB<span class="token punctuation">)</span>
+decrypted <span class="token operator">=</span> cipher<span class="token punctuation">.</span>decrypt<span class="token punctuation">(</span>encrypted_data<span class="token punctuation">)</span>
+
+<span class="token keyword">try</span><span class="token punctuation">:</span>
+    decrypted <span class="token operator">=</span> unpad<span class="token punctuation">(</span>decrypted<span class="token punctuation">,</span> AES<span class="token punctuation">.</span>block_size<span class="token punctuation">)</span>
+<span class="token keyword">except</span><span class="token punctuation">:</span>
+    <span class="token keyword">pass</span> 
+
+realm_data <span class="token operator">=</span> base64<span class="token punctuation">.</span>b64decode<span class="token punctuation">(</span>decrypted<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">'decrypted.realm'</span><span class="token punctuation">,</span> <span class="token string">'wb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+    f<span class="token punctuation">.</span>write<span class="token punctuation">(</span>realm_data<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Realm database saved as 'decrypted.realm'"</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"File size: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>realm_data<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> bytes"</span></span><span class="token punctuation">)</span></code></pre>
+<p>After verifying with the challenge author that the <code>decrypted.realm</code> file we had was correct, we were one step away from putting this challenge behind us. Or so we thought.
+Initially we spent a lot of time trying to <code>strings</code> our way through it, but it was quickly obvious that our string would not be found that way.</p>
+<p>Furthermore, we spent hours researching ways to recover deleted data from a <code>realm</code> file and this is a relatively new topic so we could not find anything other than a couple of research papers on it.</p>
+<p>At this point, we tried a whole bunch of things for hours on end.</p>
+<ul>
+<li>Unallocated Space Carving : Scanned free blocks/slack space for residual data.</li>
+<li>MVCC Version Comparison : Compared <code>TreeRootOffset01</code> (original) vs <code>TreeRootOffset02</code> (modified)</li>
+<li>Schema-Guided Recovery : Focused on <code>RealmTestClass0</code>’s string fields</li>
+<li>Haywire manual Hex/XOR Analysis which included manual inspection of <code>AAAA</code> regions and bruting random XOR tests.</li>
+</ul>
+<p>Nothing showed any signs of recovering a deleted string. We had lost hopes and had accepted our fate- but the CTF got extended by an hour. At this point we thought it was worth giving this another shot. We came across a tool https://github.com/hyuunnn/realm_recover/ and we found hope again.</p>
+<p>Upon using this tool, it generated a file <code>scan_unused_objects.txt</code>which contained</p>
+<p><img src="https://github.com/user-attachments/assets/2573349b-201c-483d-8ed3-1b2f302527c4" alt="image"></p>
+<p>which was the only &quot;UUID&quot; there. Except it wasn't a UUID at all.</p>
+<p>You see, a UUID only contains standard hexadecimal characters (0-9, A-F) and this one had chars like <code>P</code> and <code>R</code>. Looks like we finally found the second half of the flag- in the nick of time.</p>
+<h3>flagPart2:</h3>
+<pre><code>5P0BF5BC-5AA1-4790-A05F-A2RDCBALDB49
+</code></pre>
+<h1>Complete Flag</h1>
+<pre><code>bi0ctf{w311_7h47_p4r7_w45_345y_5P0BF5BC-5AA1-4790-A05F-A2RDCBALDB49}
+</code></pre>
+</main>
+  
+  <footer>&copy; Invalid DateTime</footer>
+</body>
+</html>
