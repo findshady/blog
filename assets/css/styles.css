@@ -1,16 +1,16 @@
 /* === THEME COLORS === */
-:root {
+:root.dark {
   --bg: #111;
   --bg-secondary: #1a1a1a;
   --text: #eaeaea;
   --text-secondary: #888;
   --accent: #8be9fd;
   --border: #333;
-  --shadow: rgba(255, 255, 255, 0.05);
-  --icon-color: #eaeaea;
+  --shadow: rgba(139, 233, 253, 0.1);
+  --icon-color: #888;
 }
 
-body.light {
+:root.light {
   --bg: #f0f0f0;
   --bg-secondary: #ffffff;
   --text: #1f1f1f;
@@ -18,7 +18,7 @@ body.light {
   --accent: #007acc;
   --border: #ddd;
   --shadow: rgba(0, 0, 0, 0.08);
-  --icon-color: #1f1f1f;
+  --icon-color: #555;
 }
 
 /* === BASE & FONT === */
@@ -34,151 +34,103 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* === LINKS === */
-a {
-  color: var(--accent);
+/* === FANCY LINKS & ANIMATIONS === */
+@keyframes breathing {
+  0% { transform: scale(1); text-shadow: 0 0 4px transparent; }
+  50% { transform: scale(1.05); text-shadow: 0 0 10px var(--accent); }
+  100% { transform: scale(1); text-shadow: 0 0 4px transparent; }
+}
+
+.logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem; /* Bigger */
+  font-weight: 700;
+  color: var(--text);
   text-decoration: none;
   transition: color 0.3s ease;
 }
-a:hover {
-  text-decoration: underline;
+.logo:hover {
+  animation: breathing 2s ease-in-out infinite;
+  text-decoration: none; /* No underline */
 }
 
-/* === NAVIGATION === */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0;
-  margin-bottom: 2rem;
-  font-family: "Fira Code", monospace;
-}
-.logo {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: var(--text);
-}
 .nav-links a {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem; /* Bigger */
   margin-left: 1.5rem;
   color: var(--text);
+  text-decoration: none;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 .nav-links a:hover {
+  transform: scale(1.1);
   color: var(--accent);
   text-decoration: none;
 }
 
-/* === HERO SECTION === */
-.hero {
-  border: 1px solid var(--border);
-  padding: 1.5rem 2rem;
-  border-radius: 12px;
-  background: var(--bg-secondary);
-  text-align: left;
-}
+/* === NAVIGATION & HERO === */
+.navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.hero { border: 1px solid var(--border); padding: 1.5rem 2rem; border-radius: 12px; background: var(--bg-secondary); }
 .hero p { margin: 0; }
 
-/* === POST LIST === */
-.post-list {
-  margin-top: 3rem;
-}
-.post-list-title {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0.5rem;
-}
+/* === POST LIST & HOVER ANIMATION === */
+.post-list { margin-top: 3rem; }
+.post-list-title { font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
 .post-preview {
   padding: 1.5rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg-secondary);
   margin-bottom: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .post-preview:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px var(--shadow);
+  transform: translateY(-8px) scale(1.02); /* More lively animation */
+  box-shadow: 0 10px 25px var(--shadow);
+  border-color: var(--accent);
 }
-.post-preview h3 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-}
-.post-preview h3 a {
-  font-size: 1.2rem;
-  color: var(--accent);
-  text-decoration: none;
-}
-.post-preview time {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  display: block;
-}
+.post-preview h3 { margin: 0 0 0.5rem 0; font-size: 1.2rem; }
+.post-preview h3 a { color: var(--accent); text-decoration: none; }
+.post-preview p { margin: 0.5rem 0 0 0; color: var(--text-secondary); }
+.post-preview time { font-size: 0.85rem; color: var(--text-secondary); display: block; }
 
 /* === FOOTER & SOCIAL ICONS === */
 .site-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-top: 4rem;
   padding-top: 1.5rem;
-  font-size: 0.85rem;
   border-top: 1px solid var(--border);
-  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column; /* Stack icons on top of text */
+  align-items: center; /* Center everything */
+  gap: 1.5rem; /* Space between icons and text */
 }
-.social-icons a {
-  margin-left: 0.5rem;
+.social-icons {
+  display: flex;
+  gap: 1.5rem; /* Space between icons */
+  align-items: center;
 }
 .social-icons a svg {
-  width: 28px;  /* Increased size */
-  height: 28px; /* Increased size */
+  width: 36px;  /* MUCH Bigger */
+  height: 36px; /* MUCH Bigger */
   fill: var(--icon-color);
-  opacity: 0.7;
-  transition: opacity 0.3s ease, fill 0.3s ease;
+  transition: transform 0.3s ease, fill 0.3s ease;
 }
 .social-icons a:hover svg {
-  opacity: 1;
+  transform: scale(1.2);
   fill: var(--accent);
+}
+.footer-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 /* === THEME TOGGLE === */
 .theme-toggle {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text);
-  z-index: 200;
-  transition: transform 0.2s ease, text-shadow 0.2s ease;
+  position: fixed; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text); z-index: 200; transition: transform 0.2s ease, color 0.2s ease;
 }
-.theme-toggle:hover {
-  transform: scale(1.15);
-  color: var(--accent);
-}
+.theme-toggle:hover { transform: scale(1.2); color: var(--accent); }
 
-/* === ABOUT ME PAGE === */
-.about-me {
-  padding: 2rem;
-  background: var(--bg-secondary);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  line-height: 1.6;
-}
-.about-me h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-.about-me ul {
-  list-style-type: square;
-  padding-left: 1.2rem;
-  margin-top: 1rem;
-}
-
-/* === GENERAL CONTENT === */
-.content article {
-  padding-bottom: 2rem;
-  line-height: 1.7;
-  font-size: 1rem;
+/* === OTHER PAGES === */
+.about-me, .content article {
+  padding-bottom: 2rem; line-height: 1.7; font-size: 1rem;
 }

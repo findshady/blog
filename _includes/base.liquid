@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title }} | shady</title>
@@ -10,14 +12,13 @@
 </head>
 <body>
 <nav class="navbar">
-  <a class="logo" href="/">Home</a>
+  <a class="logo" href="/">sLick.sh</a>
   <div class="nav-links">
     <a href="/author/">Author</a>
     <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Team</a>
   </div>
 </nav>
 
-  <!-- 🔁 Theme Toggle Button -->
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <span id="themeIcon">∅</span>
   </button>
@@ -29,7 +30,6 @@
   </main>
 
 <footer class="site-footer">
-  <div>© {{ "now" | date: "%Y" }} shady</div>
   <div class="social-icons">
     <a href="https://github.com/findshady" target="_blank" rel="noopener" aria-label="GitHub">
       {% include "icons/github.svg" %}
@@ -37,10 +37,15 @@
     <a href="https://www.linkedin.com/in/suraj-dhondale/" target="_blank" rel="noopener" aria-label="LinkedIn">
       {% include "icons/linkedin.svg" %}
     </a>
+    <a href="mailto:surxj666@gmail.com" aria-label="Email">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
+    </a>
+  </div>
+  <div class="footer-text">
+    © {{ "now" | date: "%Y" }} All rights reserved.
   </div>
 </footer>
 
-  <!-- 🧠 Theme Toggle Script -->
   <script>
     (function () {
       const THEMES = { LIGHT: 'light', DARK: 'dark' };
@@ -54,17 +59,16 @@
       let currentTheme = storedTheme || (prefersDark ? THEMES.DARK : THEMES.LIGHT);
 
       function applyTheme(theme) {
-        document.body.classList.toggle(THEMES.LIGHT, theme === THEMES.LIGHT);
+        document.documentElement.className = theme;
         icon.textContent = ICONS[theme];
         localStorage.setItem('theme', theme);
       }
 
       toggle.addEventListener('click', () => {
-        currentTheme = document.body.classList.contains(THEMES.LIGHT) ? THEMES.DARK : THEMES.LIGHT;
+        currentTheme = document.documentElement.classList.contains(THEMES.LIGHT) ? THEMES.DARK : THEMES.LIGHT;
         applyTheme(currentTheme);
       });
 
-      // Set initial theme on load
       applyTheme(currentTheme);
     })();
   </script>
