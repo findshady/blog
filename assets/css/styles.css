@@ -440,46 +440,77 @@ pre[class*="language-"]::before {
   border-color: var(--accent);
 }
 
-/* Code content with proper line numbers */
+/* Code content with line numbers */
 pre[class*="language-"] code {
   display: block;
-  padding: 1rem !important;
+  padding: 1rem 1rem 1rem 4rem !important;
   overflow-x: auto;
   background: transparent !important;
   color: var(--code-text) !important;
   font-family: 'Fira Code', monospace !important;
   position: relative;
   counter-reset: line-number;
+  white-space: pre;
 }
 
-/* Code lines with line numbers */
+/* Line spans with line numbers */
 pre[class*="language-"] code .line {
   display: block;
+  counter-increment: line-number;
   position: relative;
-  padding-left: 4rem;
   min-height: 1.5em;
   line-height: 1.5;
-  counter-increment: line-number;
 }
 
-/* Line numbers - refined and elegant */
+/* Line numbers */
 pre[class*="language-"] code .line::before {
   content: counter(line-number);
   position: absolute;
-  left: 0;
-  top: 0;
+  left: -4rem;
   width: 3rem;
   text-align: right;
   color: var(--line-number-color);
-  font-size: 0.85em;
+  font-size: 0.9em;
   user-select: none;
-  font-family: 'Fira Code', monospace;
-  padding-right: 1rem;
+  padding-right: 0.8rem;
   border-right: 1px solid var(--code-border);
-  margin-right: 1rem;
   background: var(--code-bg);
+  font-family: 'Fira Code', monospace;
 }
 
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 1023px) {
+  pre[class*="language-"] {
+    font-size: 13px !important;
+  }
+  
+  pre[class*="language-"] code {
+    padding-left: 3.5rem !important;
+  }
+  
+  pre[class*="language-"] code .line::before {
+    left: -3.5rem;
+    width: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  pre[class*="language-"] code {
+    padding-left: 3rem !important;
+  }
+  
+  pre[class*="language-"] code .line::before {
+    left: -3rem;
+    width: 2rem;
+    padding-right: 0.5rem;
+  }
+  
+  .copy-button {
+    top: 0.3rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
 /* === ENHANCED SYNTAX HIGHLIGHTING === */
 /* Comments */
 .token.comment,
