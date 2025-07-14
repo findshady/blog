@@ -1,134 +1,219 @@
 /* === THEME COLORS === */
 :root.dark {
   --bg: #111;
-  --bg-secondary: #1a1a1a;
-  --text: #eaeaea;
-  --text-secondary: #888;
+  --bg-offset: #181818;
+  --text: #e2e2e2;
+  --text-secondary: #a0a0a0;
   --accent: #8be9fd;
-  --border: #333;
+  --border: #2a2a2a;
   --shadow: rgba(139, 233, 253, 0.1);
-  --icon-color: #888;
+  --code-bg: #1e1e1e;
 }
 
 :root.light {
-  --bg: #f0f0f0;
-  --bg-secondary: #ffffff;
+  --bg: #f5f5f5;
+  --bg-offset: #fff;
   --text: #1f1f1f;
   --text-secondary: #555;
   --accent: #007acc;
-  --border: #ddd;
+  --border: #e0e0e0;
   --shadow: rgba(0, 0, 0, 0.08);
-  --icon-color: #555;
+  --code-bg: #f9f9f9;
 }
 
 /* === BASE & FONT === */
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Fira Code', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 16px;
-  line-height: 1.7;
-  max-width: 720px;
-  margin: auto;
-  padding: 2rem;
+  line-height: 1.8;
+  margin: 0;
+  padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* === FANCY LINKS & ANIMATIONS === */
-@keyframes breathing {
-  0% { transform: scale(1); text-shadow: 0 0 4px transparent; }
-  50% { transform: scale(1.05); text-shadow: 0 0 10px var(--accent); }
-  100% { transform: scale(1); text-shadow: 0 0 4px transparent; }
+/* === STICKY HEADER === */
+.site-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: var(--bg);
+  z-index: 1000;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
 }
 
 .logo {
   font-family: 'Orbitron', sans-serif;
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+}
+.logo:hover { text-decoration: none; }
+
+.nav-links { display: flex; align-items: center; gap: 1.5rem; }
+.nav-links a, .theme-toggle {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
   color: var(--text);
   text-decoration: none;
   transition: color 0.3s ease;
 }
-.logo:hover {
-  animation: breathing 2s ease-in-out infinite;
-  text-decoration: none;
-}
-
-/* === NAVIGATION === */
-.navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.nav-links { display: flex; align-items: center; gap: 1.5rem; }
-
-.nav-links a, .theme-toggle {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.2rem;
-  color: var(--text);
-  text-decoration: none;
-  transition: transform 0.3s ease, color 0.3s ease;
-}
 .nav-links a:hover, .theme-toggle:hover {
-  transform: scale(1.1);
   color: var(--accent);
-  text-decoration: none;
-  animation: breathing 2s ease-in-out infinite;
+}
+.theme-toggle { background: none; border: none; padding: 0; cursor: pointer; }
+
+/* === LAYOUTS (POST vs. STANDARD) === */
+.content-standard {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 2rem;
 }
 
-/* Style the button to look like the links */
-.theme-toggle {
-  background: none;
-  border: none;
+.post-layout {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile first */
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  gap: 4rem;
+}
+
+@media (min-width: 1024px) {
+  .post-layout {
+    grid-template-columns: 240px 1fr; /* 2-column layout on desktop */
+  }
+}
+
+/* === STICKY TABLE OF CONTENTS === */
+.post-sidebar {
+  position: sticky;
+  top: 100px; /* Aligns below the sticky header */
+  align-self: start;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+  display: none; /* Hidden on mobile */
+}
+@media (min-width: 1024px) {
+  .post-sidebar { display: block; }
+}
+
+.table-of-contents h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+.toc-list ul {
+  list-style: none;
   padding: 0;
-  cursor: pointer;
-  line-height: inherit; /* Ensure vertical alignment */
+  margin: 0;
+}
+.toc-list li a {
+  display: block;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 2px solid var(--border);
+  padding-left: 1rem;
+  transition: all 0.2s ease;
+}
+.toc-list li a:hover {
+  color: var(--accent);
+  border-left-color: var(--accent);
 }
 
+/* === POST HERO & CONTENT === */
+.post-hero {
+  text-align: center;
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+.post-hero h1 {
+  font-size: 3rem;
+  margin: 0 0 1rem 0;
+  font-family: 'Orbitron', sans-serif;
+}
+.post-hero .post-meta {
+  color: var(--text-secondary);
+  font-family: 'Fira Code', monospace;
+}
+.post-content article h1, .post-content article h2, .post-content article h3 {
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+}
+.post-content article a { color: var(--accent); }
+.post-content article img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
 
-/* === HERO SECTION === */
-.hero { border: 1px solid var(--border); padding: 1.5rem 2rem; border-radius: 12px; background: var(--bg-secondary); }
-.hero p { margin: 0; }
+/* === BEAUTIFUL CODE BLOCKS === */
+pre, code { font-family: 'Fira Code', monospace; }
 
-/* === POST LIST & HOVER ANIMATION === */
-.post-list { margin-top: 3rem; }
-.post-list-title { font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
-.post-preview {
-  padding: 1.5rem;
+div[class*="language-"] {
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg-secondary);
-  margin-bottom: 1.5rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  background-color: var(--code-bg);
+  margin: 2rem 0;
+  position: relative;
 }
-.post-preview:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 10px 25px var(--shadow);
-  border-color: var(--accent);
+/* Header for the code block (e.g., "language-js") */
+div[class*="language-"]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: -0.8rem;
+  right: 1rem;
+  padding: 0.2rem 0.5rem;
+  background-color: var(--accent);
+  color: var(--bg);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border-radius: 4px;
 }
-.post-preview h3 { margin: 0 0 0.5rem 0; font-size: 1.2rem; }
-.post-preview h3 a { color: var(--accent); text-decoration: none; }
-.post-preview p { margin: 0.5rem 0 0 0; color: var(--text-secondary); }
-.post-preview time { font-size: 0.85rem; color: var(--text-secondary); display: block; }
 
-/* === FOOTER & SOCIAL ICONS === */
-.site-footer {
+pre[class*="language-"] {
+  padding: 1.5rem;
+  background: none !important; /* Override syntax highlight plugin bg */
+  margin: 0 !important; /* Override plugin margin */
+  border: none !important; /* Override plugin border */
+}
+
+/* Syntax Highlighting Colors */
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
+.token.punctuation { color: #d4d4d4; }
+.token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
+.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
+.token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
+.token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
+.token.function, .token.class-name { color: #dcdcaa; }
+.token.regex, .token.important, .token.variable { color: #9cdcfe; }
+
+/* === FOOTER === */
+.site-footer-bottom {
   margin-top: 4rem;
-  padding-top: 1.5rem;
+  padding: 2rem;
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
 }
-.social-icons { display: flex; gap: 1.5rem; align-items: center; }
-.social-icons a svg {
-  width: 36px;
-  height: 36px;
-  fill: var(--icon-color);
-  transition: transform 0.3s ease, fill 0.3s ease;
-}
-.social-icons a:hover svg {
-  transform: scale(1.2);
-  fill: var(--accent);
-}
+.social-icons { display: flex; gap: 1.5rem; }
+.social-icons a svg { width: 32px; height: 32px; fill: var(--icon-color); transition: transform 0.3s ease, fill 0.3s ease; }
+.social-icons a:hover svg { transform: translateY(-3px); fill: var(--accent); }
 .footer-text { font-size: 0.9rem; color: var(--text-secondary); }
-
-/* === GENERAL CONTENT === */
-.content article { padding-bottom: 2rem; line-height: 1.7; font-size: 1rem; }
