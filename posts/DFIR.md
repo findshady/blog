@@ -255,7 +255,7 @@ for filename, key in keys.items():
 
 and sure enough, that outputted the first part of our flag
 
-```
+```python
 └─$ python3 solve.py
 
 Decrypted note from 15052025175732777833:
