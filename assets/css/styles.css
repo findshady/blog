@@ -362,7 +362,7 @@ pre[class*="language-"] {
   padding: 0 !important;
   margin: 2rem 0 !important;
   font-size: 14px !important;
-  line-height: 1.5 !important;
+  line-height: 1.4 !important;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   position: relative;
@@ -408,40 +408,51 @@ pre[class*="language-"]::before {
   border-color: var(--accent);
 }
 
-/* Code content with proper line numbers */
+/* Code content with refined line numbers */
 pre[class*="language-"] code {
   display: block;
-  padding: 1rem !important;
+  padding: 1rem 1rem 1rem 0 !important;
   overflow-x: auto;
   background: transparent !important;
   color: #f8f8f2 !important;
   font-family: 'Fira Code', monospace !important;
   position: relative;
-  counter-reset: line-number;
+  line-height: 1.4;
 }
 
+/* Line number styling - refined and elegant */
+pre[class*="language-"] .line-numbers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3.5rem;
+  height: 100%;
+  background: var(--code-bg);
+  border-right: 1px solid var(--code-border);
+  padding: 1rem 0;
+  user-select: none;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+pre[class*="language-"] .line-numbers .line-number {
+  display: block;
+  height: 1.4em;
+  line-height: 1.4;
+  color: #6b7280;
+  font-size: 0.8rem;
+  text-align: right;
+  padding-right: 0.75rem;
+  font-family: 'Fira Code', monospace;
+  font-weight: 400;
+}
+
+/* Code lines with proper spacing */
 pre[class*="language-"] code .line {
   display: block;
-  position: relative;
-  padding-left: 3.5rem;
-  counter-increment: line-number;
-  min-height: 1.5em;
-}
-
-pre[class*="language-"] code .line::before {
-  content: counter(line-number);
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 2.5rem;
-  text-align: right;
-  color: #6272a4;
-  font-size: 0.85em;
-  user-select: none;
-  font-family: 'Fira Code', monospace;
-  padding-right: 1rem;
-  border-right: 1px solid var(--border);
-  margin-right: 1rem;
+  padding-left: 4rem;
+  min-height: 1.4em;
+  line-height: 1.4;
 }
 
 /* === ENHANCED SYNTAX HIGHLIGHTING === */
@@ -607,12 +618,16 @@ pre[class*="language-"] code .line::before {
     min-height: 200px;
   }
   
-  pre[class*="language-"] code .line {
-    padding-left: 3rem;
+  pre[class*="language-"] .line-numbers {
+    width: 3rem;
   }
   
-  pre[class*="language-"] code .line::before {
-    width: 2rem;
+  pre[class*="language-"] .line-numbers .line-number {
+    padding-right: 0.5rem;
+  }
+  
+  pre[class*="language-"] code .line {
+    padding-left: 3.5rem;
   }
   
   .copy-button {
