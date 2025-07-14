@@ -1,8 +1,26 @@
-/* === FONT AND BASE === */
+/* assets/css/styles.css */
+
+/* === FONT AND BASE (DARK THEME DEFAULT) === */
 :root {
   --bg: #111;
+  --bg-secondary: #1a1a1a;
   --text: #eaeaea;
+  --text-secondary: #888;
   --accent: #8be9fd;
+  --border: #333;
+  --shadow: rgba(255, 255, 255, 0.05);
+  --icon-color: #eaeaea;
+}
+
+body.light {
+  --bg: #f0f0f0; /* Papery / Light Grey Background */
+  --bg-secondary: #ffffff;
+  --text: #1f1f1f;
+  --text-secondary: #555;
+  --accent: #007acc;
+  --border: #ddd;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --icon-color: #1f1f1f;
 }
 
 body {
@@ -17,12 +35,6 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-body.light {
-  --bg: #fdfdfd;
-  --text: #111;
-  --accent: #007acc;
-}
-
 /* === LINKS === */
 a {
   color: var(--accent);
@@ -31,130 +43,10 @@ a {
 }
 
 a:hover {
-  color: #fff;
-  text-shadow: 0 0 8px #8be9fd88;
+  text-decoration: underline;
 }
 
-/* === POST CARDS === */
-.post-card {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid #333;
-  border-radius: 10px;
-  background: #1c1c1c;
-  margin-bottom: 1.5rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.post-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.08);
-  border-color: #555;
-}
-
-.post-thumb {
-  width: 120px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.post-body {
-  flex: 1;
-}
-
-.post-body h2 {
-  font-size: 1.1rem;
-  margin-bottom: 0.3rem;
-}
-
-.meta {
-  font-size: 0.85rem;
-  color: #888;
-  margin-top: 0.2rem;
-}
-
-.tags {
-  margin-top: 0.5rem;
-}
-
-.tag {
-  display: inline-block;
-  font-size: 0.75rem;
-  background: #333;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  margin-right: 0.3rem;
-  color: #ccc;
-}
-
-/* === BLOB BACKGROUND === */
-.blob-bg {
-  position: absolute;
-  top: 20vh;
-  left: 50%;
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(circle at center, #ffffff0d, transparent 70%);
-  filter: blur(80px);
-  transform: translateX(-50%);
-  z-index: 0;
-  pointer-events: none;
-  border-radius: 50%;
-}
-
-/* === GRAIN OVERLAY === */
-.grain-overlay {
-  pointer-events: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  background-image: url('https://grainy-gradients.vercel.app/noise.png');
-  opacity: 0.06;
-  mix-blend-mode: screen;
-}
-
-/* === THEME TOGGLE === */
-.theme-toggle {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  font-family: monospace;
-  cursor: pointer;
-  color: var(--text);
-  z-index: 200;
-  transition: transform 0.2s ease, text-shadow 0.2s ease;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.15);
-  text-shadow: 0 0 6px var(--accent);
-}
-
-.theme-toggle:active span {
-  animation: glitch 0.3s linear;
-}
-
-/* === GLITCH ANIMATION === */
-@keyframes glitch {
-  0%   { transform: scale(1); }
-  25%  { transform: scale(1.3) rotate(2deg); }
-  50%  { transform: scale(0.95); }
-  75%  { transform: scale(1.1) rotate(-1deg); }
-  100% { transform: scale(1); }
-}
-.content article {
-  padding-bottom: 2rem;
-  line-height: 1.7;
-  font-size: 1rem;
-}
+/* === NAVBAR === */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -182,12 +74,14 @@ a:hover {
 .nav-links a:hover {
   color: var(--accent);
 }
+
+/* === HERO SECTION === */
 .hero {
-  border: 1px solid #444;
+  border: 1px solid var(--border);
   padding: 1.5rem 2rem;
   border-radius: 12px;
   margin: 2rem auto;
-  background: #111;
+  background: var(--bg); /* Use var to adapt */
   font-family: "Fira Code", monospace;
   max-width: 720px;
   text-align: left;
@@ -204,65 +98,48 @@ a:hover {
   font-style: italic;
   opacity: 0.8;
 }
+
+/* === POST LIST === */
 .post-list {
-  margin-top: 2rem;
+  margin-top: 3rem;
+}
+
+.post-list h2.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
 }
 
 .post-preview {
   padding: 1rem 1.5rem;
-  border: 1px solid #333;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: #1a1a1a;
+  background: var(--bg-secondary);
   margin-bottom: 1.5rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .post-preview:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 16px var(--shadow);
 }
 
-.post-preview h2 {
+.post-preview h3 a {
   margin: 0;
   font-size: 1.1rem;
-}
-
-.post-preview time {
-  font-size: 0.85rem;
-  color: #777;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-.about-me {
-  max-width: 720px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: #111;
-  border-radius: 10px;
-  border: 1px solid #333;
-  font-family: "Fira Code", monospace;
-  line-height: 1.6;
-}
-
-.about-me h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.about-me ul {
-  list-style-type: square;
-  padding-left: 1.2rem;
-  margin-top: 1rem;
-}
-
-.about-me a {
   color: var(--accent);
   text-decoration: none;
 }
 
-.about-me a:hover {
-  text-decoration: underline;
+.post-preview time {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  display: block;
 }
+
+/* === FOOTER & SOCIAL ICONS === */
 .site-footer {
   display: flex;
   justify-content: space-between;
@@ -271,18 +148,31 @@ a:hover {
   padding: 1.5rem 2rem;
   font-family: "Fira Code", monospace;
   font-size: 0.85rem;
-  border-top: 1px solid #333;
-  color: #888;
+  border-top: 1px solid var(--border);
+  color: var(--text-secondary);
 }
 
-.social-icons a img {
-  width: 20px;
-  height: 20px;
+.social-icons a svg {
+  width: 22px;
+  height: 22px;
   margin-left: 1rem;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
+  fill: var(--icon-color); /* Use fill to color the SVG */
+  opacity: 0.7;
+  transition: opacity 0.3s ease, fill 0.3s ease;
 }
 
-.social-icons a:hover img {
+.social-icons a:hover svg {
   opacity: 1;
+  fill: var(--accent);
+}
+
+/* === MISC === */
+.content article {
+  padding-bottom: 2rem;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.blob-bg, .grain-overlay, .theme-toggle {
+  display: none; /* Disabling these for clarity, you can re-enable if you wish */
 }

@@ -1,4 +1,28 @@
 .
+├── assets
+│   ├── css
+│   │   └── styles.css
+│   ├── icons
+│   │   ├── github.svg
+│   │   └── linkedin.svg
+│   └── img
+│       └── bi0spng.png
+├── author.md
+├── dist
+│   ├── assets
+│   │   └── css
+│   │       └── styles.css
+│   ├── base
+│   │   └── index.html
+│   ├── DFIR
+│   │   └── index.html
+│   ├── index.html
+│   └── posts
+│       └── DFIR
+│           └── index.html
+├── _includes
+│   └── base.liquid
+├── index.liquid
 ├── node_modules
 │   ├── @11ty
 │   │   ├── dependency-tree
@@ -2751,6 +2775,8 @@
 │       └── wrapper.mjs
 ├── package.json
 ├── package-lock.json
+├── posts
+│   └── DFIR.md
 └── tree_blog.txt
 
-363 directories, 2391 files
+376 directories, 2404 files

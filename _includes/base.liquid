@@ -30,16 +30,13 @@
     </article>
   </main>
 
-<footer class="site-footer">
-  <div>&copy; {{ "now" | date: "%Y" }} shady</div>
-  <div class="social-icons">
-    <a href="https://github.com/findshady" target="_blank" rel="noopener" aria-label="GitHub">
-      <img src="/assets/icons/github.svg" alt="GitHub" />
-    </a>
-    <a href="https://www.linkedin.com/in/suraj-dhondale/" target="_blank" rel="noopener" aria-label="LinkedIn">
-      <img src="/assets/icons/linkedin.svg" alt="LinkedIn" />
-    </a>
-  </div>
+<footer>
+  <a href="https://github.com/findshady" class="social-icon">
+    {% include 'icons/github.svg' %}
+  </a>
+  <a href="https://www.linkedin.com/in/shady-alsalem" class="social-icon">
+    {% include 'icons/linkedin.svg' %}
+  </a>
 </footer>
 
 

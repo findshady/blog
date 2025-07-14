@@ -1,13 +1,102 @@
 ---
-title: About Me
+title: Home
 layout: base
 ---
 
-<section class="about-me">
+<section class="hero">
   <h1>shady</h1>
-  <p><strong>Suraj D H</strong> — 19, sophomore at Manipal Institute of Technology, Manipal</p>
-
-  <p>Currently learning: malware analysis, understanding VMs</p>
-
-  <p>Junior @ <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Cryptonite MIT</a></p>
+  <p><strong>Suraj D H</strong> — 19, sophomore at Manipal Institute of Technology, Manipal. Currently learning malware analysis and understanding VMs. Junior @ <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Cryptonite MIT</a>.</p>
 </section>
+
+<div class="post-list">
+  <h2 class="section-title">Latest Posts</h2>
+  {%- for post in collections.post | reverse -%}
+    <div class="post-preview">
+      <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %d, %Y" }}</time>
+      <h3>
+        <a href="{{ post.url | url }}">{{ post.data.title }}</a>
+      </h3>
+      <p>{{ post.data.description }}</p>
+    </div>
+  {%- endfor -%}
+</div>```
+
+### 3. `_includes/base.liquid` (Updated)
+
+I've changed the social media icons from `<img>` tags to be included directly as SVGs. This is the key to making them change color with your theme.
+
+**IMPORTANT**: For this to work, you must **move your `icons` folder from `/assets` into the `/_includes` folder**. Your new icon path should be `/_includes/icons/github.svg`.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} | slick.sh</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css">
+</head>
+<body>
+<nav class="navbar">
+  <a class="logo" href="/">☠ slick.sh</a>
+  <div class="nav-links">
+    <a href="/author">Author</a>
+    <a href="https://cryptonitemit.in/" target="_blank" rel="noopener">Team</a>
+  </div>
+</nav>
+
+  <!-- 🔁 Theme Toggle Button -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <span id="themeIcon">∅</span>
+  </button>
+
+  <main class="content">
+    <article>
+      {{ content }}
+    </article>
+  </main>
+
+<footer class="site-footer">
+  <div>© {% year %} shady</div>
+  <div class="social-icons">
+    <a href="https://github.com/findshady" target="_blank" rel="noopener" aria-label="GitHub">
+      {% include "icons/github.svg" %}
+    </a>
+    <a href="https://www.linkedin.com/in/suraj-dhondale/" target="_blank" rel="noopener" aria-label="LinkedIn">
+      {% include "icons/linkedin.svg" %}
+    </a>
+  </div>
+</footer>
+
+  <!-- 🧠 Theme Toggle Script -->
+  <script>
+    (function () {
+      const THEMES = { LIGHT: 'light', DARK: 'dark' };
+      const ICONS = { [THEMES.LIGHT]: '⋆', [THEMES.DARK]: '∅' };
+      
+      const toggle = document.getElementById('themeToggle');
+      const icon = document.getElementById('themeIcon');
+      
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const storedTheme = localStorage.getItem('theme');
+      let currentTheme = storedTheme || (prefersDark ? THEMES.DARK : THEMES.LIGHT);
+
+      function applyTheme(theme) {
+        document.body.classList.toggle(THEMES.LIGHT, theme === THEMES.LIGHT);
+        icon.textContent = ICONS[theme];
+        localStorage.setItem('theme', theme);
+      }
+
+      toggle.addEventListener('click', () => {
+        currentTheme = document.body.classList.contains(THEMES.LIGHT) ? THEMES.DARK : THEMES.LIGHT;
+        applyTheme(currentTheme);
+      });
+
+      // Set initial theme on load
+      applyTheme(currentTheme);
+    })();
+  </script>
+</body>
+</html>
